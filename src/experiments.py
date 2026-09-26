@@ -3,16 +3,20 @@
 Alle Experimente nutzen dieselben Parameterziehungen (common random numbers), damit
 Unterschiede zwischen Konfigurationen nicht auf Ziehungsrauschen zurückgehen.
 
-Die Hypothesenkriterien sind vor dem ersten Simulationslauf festgelegt
-(planning/chapter_plan.md, Abschnitt 3.3) und hier unverändert kodiert.
+Die Hypothesenkriterien wurden vor der Durchführung der Simulation im Forschungsplan festgelegt
+(planning/chapter_plan.md, Abschnitt 3.3) und sind hier unverändert kodiert.
+
+Modellvarianten (horizon, trigger) und Verteilungsvarianten dienen der Robustheitsprüfung;
+der Basisfall ist horizon="cutoff", trigger="reactive", PERT mit λ = 4.
 """
 
 import numpy as np
 
-from .analysis import crossing, crossing_down, prcc, summary
+from .analysis import crossing, crossing_down, prcc, srrc, summary
 from .model import CATEGORIES, delta, present_values
-from .params import (DISCOUNT_RATE, SCENARIO_PROBS, SCENARIOS, T_YEARS, UNCERTAIN,
-                     modes)
+from .params import (DISCOUNT_RATE, N_RUNS, SCENARIO_PROBS, SCENARIOS, SEED, T_YEARS,
+                     UNCERTAIN, UNCERTAIN_BY_SYMBOL, modes)
+from .sampling import sample
 
 # --- vorregistrierte Hypothesenkriterien ----------------------------------------
 H1_MIN_SHARE = 0.80   # Anteil der Läufe mit EV(MF) < EV(MS)
@@ -25,9 +29,16 @@ G_GRID = np.round(np.arange(0.0, 1.0001, 0.01), 4)
 SYMBOLS = [u.symbol for u in UNCERTAIN]
 
 
-def expected_delta(p, probs=SCENARIO_PROBS, T=T_YEARS, i=DISCOUNT_RATE):
-    """ΔEV = EV(MF) − EV(MS) je Ziehung; > 0 heißt Microservices im EV günstiger."""
-    return sum(probs[s] * delta(p, g, T=T, i=i) for s, g in SCENARIOS.items())
+def expected_delta(p, probs=SCENARIO_PROBS, T=T_YEARS, i=DISCOUNT_RATE, **model):
+    """ΔEV = EV(MF) − EV(MS) je Ziehung (szenariogewichtete Kostendifferenz eines
+    Parametersatzes); > 0 heißt Microservices im Erwartungswert über die Szenarien günstiger."""
+    return sum(probs[s] * delta(p, g, T=T, i=i, **model) for s, g in SCENARIOS.items())
+
+
+def mc_interval(share, n):
+    """95-%-Intervall eines Anteils (Normalapproximation) und Standardfehler."""
+    se = float(np.sqrt(share * (1 - share) / n))
+    return {"se": se, "lo": max(0.0, share - 1.96 * se), "hi": min(1.0, share + 1.96 * se)}
 
 
 def scenarios(p):
@@ -64,11 +75,11 @@ def base_case_detail():
     return rows
 
 
-def growth_curve(p, grid=G_GRID, T=T_YEARS):
+def growth_curve(p, grid=G_GRID, T=T_YEARS, **model):
     """P(MS günstiger) und Verteilung von ΔK über die stetige Wachstumsachse."""
     rows = []
     for g in grid:
-        dK = delta(p, g, T=T)
+        dK = delta(p, g, T=T, **model)
         rows.append({"g": float(g), "P_MS_guenstiger": float(np.mean(dK > 0)), **summary(dK)})
     P = [r["P_MS_guenstiger"] for r in rows]
     thresholds = {f"g_bei_P{int(l * 100)}": crossing(grid, P, l) for l in (0.2, 0.5, 0.8)}
@@ -81,8 +92,10 @@ def per_draw_breakeven(p, T=T_YEARS, g_max=1.5, step=0.005):
     grid = np.arange(0.0, g_max + 1e-9, step)
     n = len(p["h"])
     g_star = np.full(n, np.nan)
+    reverts = np.zeros(n, dtype=bool)          # nach erstem ΔK > 0 wieder ΔK ≤ 0
     for g in grid:
         pos = delta(p, g, T=T) > 0
+        reverts |= ~np.isnan(g_star) & ~pos
         new = np.isnan(g_star) & pos
         g_star[new] = g
     g_cap = p["h"] ** (1.0 / T) - 1.0
@@ -92,6 +105,7 @@ def per_draw_breakeven(p, T=T_YEARS, g_max=1.5, step=0.005):
     diff = g_star[ok] - g_cap[ok]
     return {
         "anteil_mit_breakeven_bis_gmax": float(ok.mean()),
+        "anteil_nicht_eindeutig": float(reverts.mean()),
         "g_max": g_max,
         "g_star": summary(g_star[ok]),
         "g_kapazitaet": summary(g_cap),
@@ -112,13 +126,26 @@ def heatmap(p, g_grid=np.round(np.arange(0.0, 1.0001, 0.05), 3),
             "P": P.round(4).tolist()}
 
 
-def global_sensitivity(p, d_ev):
-    """PRCC aller unsicheren Parameter mit ΔEV sowie mit ΔK im starken Szenario; H3."""
+def global_sensitivity(p, d_ev, n_boot=200, seed=SEED):
+    """PRCC und Varianzanteile (SRRC²) aller Parameter mit ΔEV sowie mit ΔK im starken
+    Szenario; Bootstrap-Intervalle der PRCC-Ränge; Prüfung von H3."""
     X = np.column_stack([p[s] for s in SYMBOLS])
-    r_ev = prcc(X, d_ev)
-    r_st = prcc(X, delta(p, SCENARIOS["stark"]))
-    table = [{"symbol": s, "prcc_dEV": float(a), "prcc_dK_stark": float(b)}
-             for s, a, b in zip(SYMBOLS, r_ev, r_st)]
+    d_st = delta(p, SCENARIOS["stark"])
+    r_ev, r_st = prcc(X, d_ev), prcc(X, d_st)
+    s_ev, r2_ev = srrc(X, d_ev)
+    s_st, r2_st = srrc(X, d_st)
+    rng = np.random.default_rng(seed + 1)
+    ranks = np.empty((n_boot, len(SYMBOLS)), dtype=int)
+    n = X.shape[0]
+    for b in range(n_boot):
+        idx = rng.integers(0, n, n)
+        rb = np.abs(prcc(X[idx], d_ev[idx]))
+        ranks[b] = np.argsort(np.argsort(-rb)) + 1
+    table = [{"symbol": s, "prcc_dEV": float(a), "prcc_dK_stark": float(b),
+              "srrc2_dEV": float(c ** 2), "srrc2_dK_stark": float(e ** 2),
+              "rang_boot_lo": int(np.percentile(ranks[:, j], 2.5)),
+              "rang_boot_hi": int(np.percentile(ranks[:, j], 97.5))}
+             for j, (s, a, b, c, e) in enumerate(zip(SYMBOLS, r_ev, r_st, s_ev, s_st))]
     table.sort(key=lambda r: -abs(r["prcc_dEV"]))
     rank = {r["symbol"]: k + 1 for k, r in enumerate(table)}
     worst_A = max(rank[s] for s in H3_GROUP_A)
@@ -131,7 +158,114 @@ def global_sensitivity(p, d_ev):
     h3["stark"] = {"rang": rank_st,
                    "bestaetigt": bool(max(rank_st[s] for s in H3_GROUP_A)
                                       < min(rank_st[s] for s in H3_GROUP_B))}
+    h3["r2_rangregression"] = {"dEV": float(r2_ev), "dK_stark": float(r2_st)}
     return table, h3
+
+
+def equal_width_prcc(n=N_RUNS, seed=SEED, rel=0.5):
+    """PRCC-Ränge bei gleich breiten relativen Bereichen (Modus ± rel), um die Abhängigkeit
+    der Rangfolge von den gesetzten Bereichsbreiten sichtbar zu machen."""
+    ranges = {}
+    for u in UNCERTAIN:
+        if u.symbol == "psi":            # relative Größe um 0: V_S = V(1+ψ) ± rel
+            ranges[u.symbol] = (-rel, 0.0, rel)
+        else:
+            ranges[u.symbol] = (u.mode * (1 - rel), u.mode, u.mode * (1 + rel))
+    p = sample(n, np.random.default_rng(seed), ranges=ranges)
+    X = np.column_stack([p[s] for s in SYMBOLS])
+    r = np.abs(prcc(X, expected_delta(p)))
+    order = np.argsort(-r)
+    return {SYMBOLS[j]: k + 1 for k, j in enumerate(order)}
+
+
+def monotonicity(p, symbols=("h", "d", "mu", "Phi", "kappa"), n_sub=2000, n_grid=9):
+    """Anteil der Ziehungen, in denen ΔEV im jeweiligen Parameter monoton verläuft
+    (Voraussetzung für die Deutung des PRCC)."""
+    sub = {k: v[:n_sub] for k, v in p.items()}
+    out = {}
+    for sym in symbols:
+        u = UNCERTAIN_BY_SYMBOL[sym]
+        vals = np.linspace(u.low, u.high, n_grid)
+        ys = np.column_stack([expected_delta(dict(sub, **{sym: np.full(n_sub, v)})) for v in vals])
+        dif = np.diff(ys, axis=1)
+        tol = 1e-6 * np.maximum(1.0, np.abs(ys).max(axis=1, keepdims=True))
+        mono = np.all(dif >= -tol, axis=1) | np.all(dif <= tol, axis=1)
+        out[sym] = float(mono.mean())
+    return out
+
+
+def trigger_shares(p, T=T_YEARS):
+    """Anteil der Ziehungen mit ausgelöster bzw. im Horizont abgeschlossener Migration."""
+    rows = {}
+    for name, g in SCENARIOS.items():
+        _, _, det = present_values(p, g, T=T, detail=True)
+        start, end = det["migrationsstart_jahr"], det["migrationsende_jahr"]
+        rows[name] = {"ausgeloest": float(np.mean(~np.isnan(start))),
+                      "abgeschlossen": float(np.mean(end <= T))}
+    return rows
+
+
+def trigger_decomposition(p, g=SCENARIOS["stark"], T=T_YEARS):
+    """P(MS günstiger | Migration ausgelöst / nicht ausgelöst) und Break-even ohne Grenze."""
+    _, _, det = present_values(p, g, T=T, detail=True)
+    trig = ~np.isnan(det["migrationsstart_jahr"])
+    pos = delta(p, g, T=T) > 0
+    no_limit = dict(p, h=np.full_like(p["h"], 1e9))
+    _, thr = growth_curve(no_limit, grid=np.round(np.arange(0.0, 1.0001, 0.02), 4), T=T)
+    return {"P_MS_ausgeloest": float(pos[trig].mean()) if trig.any() else None,
+            "P_MS_nicht_ausgeloest": float(pos[~trig].mean()) if (~trig).any() else None,
+            "g_bei_P50_ohne_grenze": thr["g_bei_P50"]}
+
+
+VARIANTS = [
+    # (Schlüssel, Beschreibung, Ziehungs-Optionen, Modell-Optionen, Zinssatz, Horizont)
+    ("basis", "Basisfall (Tab. 2)", {}, {}, None, None),
+    ("verpflichtung", "Beschlossene Migrationskosten voll angerechnet", {},
+     {"horizon": "committed"}, None, None),
+    ("vorausschauend", "Vorausschauende Migration", {}, {"trigger": "proactive"}, None, None),
+    ("beides", "Voll angerechnet und vorausschauend", {},
+     {"horizon": "committed", "trigger": "proactive"}, None, None),
+    ("h_klein", "Kapazitätsreserve h: 2 / 4 / 10", {"ranges": {"h": (2.0, 4.0, 10.0)}}, {}, None, None),
+    ("h_gross", "Kapazitätsreserve h: 2 / 10 / 50", {"ranges": {"h": (2.0, 10.0, 50.0)}}, {}, None, None),
+    ("phi_niedrig", "Plattform-Grundlast niedrig (verwaltete Dienste): 5 / 15 / 30 Tsd.",
+     {"ranges": {"Phi": (5_000, 15_000, 30_000)}}, {}, None, None),
+    ("phi_hoch", "Plattform-Grundlast hoch (inkl. Betriebsstelle): 60 / 100 / 150 Tsd.",
+     {"ranges": {"Phi": (60_000, 100_000, 150_000)}}, {}, None, None),
+    ("skala5", "Skalenanker I_M × 5 (2 Mio. EUR)", {"I_M": 2_000_000}, {}, None, None),
+    ("lambda2", "PERT λ = 2 (flacher)", {"lam": 2.0}, {}, None, None),
+    ("lambda6", "PERT λ = 6 (spitzer)", {"lam": 6.0}, {}, None, None),
+    ("gleich", "Gleichverteilung", {"dist": "uniform"}, {}, None, None),
+    ("zins0", "Zinssatz 0 %", {}, {}, 0.0, None),
+    ("zins10", "Zinssatz 10 %", {}, {}, 0.10, None),
+    ("T10", "Horizont 10 Jahre", {}, {}, None, 10),
+]
+
+
+def variants(n=N_RUNS, seed=SEED, grid=np.round(np.arange(0.0, 1.0001, 0.02), 4)):
+    """Robustheitsvarianten: H1-Anteil, P(MS | stark) mit 95-%-Intervall, g* (P = 50 %)
+    und Übergangsbereich (P = 20 % bis 80 %)."""
+    rows = []
+    for key, label, samp, model, rate, T in VARIANTS:
+        samp = dict(samp)
+        I_M = samp.pop("I_M", None)
+        p = sample(n, np.random.default_rng(seed), **samp)
+        if I_M is not None:
+            p["I_M"] = I_M
+        i = DISCOUNT_RATE if rate is None else rate
+        T = T_YEARS if T is None else T
+        d_ev = expected_delta(p, T=T, i=i, **model)
+        p_st = float(np.mean(delta(p, SCENARIOS["stark"], T=T, i=i, **model) > 0))
+        curve = []
+        for g in grid:
+            curve.append(float(np.mean(delta(p, g, T=T, i=i, **model) > 0)))
+        rows.append({
+            "key": key, "label": label,
+            "H1": float(np.mean(d_ev < 0)), "H2": p_st, "H2_ci": mc_interval(p_st, n),
+            "mean_dEV": float(np.mean(d_ev)),
+            "g_P20": crossing(grid, curve, 0.2), "g_P50": crossing(grid, curve, 0.5),
+            "g_P80": crossing(grid, curve, 0.8),
+        })
+    return rows
 
 
 def tornado(T=T_YEARS):

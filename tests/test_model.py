@@ -22,8 +22,8 @@ def test_no_growth_no_migration_and_mono_cheaper():
     assert K_MF[0] < K_MS[0]
 
 
-def test_identical_architectures_only_differ_by_investment():
-    # ohne Mehraufwand, gleiche Exponenten, keine Migration: Differenz = 0
+def test_identical_architectures_without_any_overhead_cost_the_same():
+    # κ = 0, ohne Mehraufwand, gleiche Exponenten, keine Migration: Differenz = 0
     p = base(kappa=0.0, omega=0.0, Phi=0.0, psi=0.0, gamma_S=0.6, gamma_M=0.6,
              beta_S=1.1, beta_M=1.1, s=0.0, h=1e9)
     K_MS, K_MF = present_values(p, 0.3)
@@ -90,3 +90,44 @@ def test_prcc_detects_monotone_dependence():
     y = 5 * X[:, 0] - 1 * X[:, 1] + rng.normal(scale=0.1, size=2000)
     r = prcc(X, y)
     assert r[0] > 0.9 and r[1] < -0.5 and abs(r[2]) < 0.1
+
+
+def test_committed_variant_adds_remaining_migration_cost():
+    p = base(h=5.0, d=3.0, mu=1.0)
+    _, K_cut = present_values(p, 0.6, T=5, i=0.0)
+    _, K_com = present_values(p, 0.6, T=5, i=0.0, horizon="committed")
+    _, _, det = present_values(p, 0.6, T=5, i=0.0, detail=True, horizon="committed")
+    assert K_com[0] > K_cut[0]
+    # ohne Diskontierung: volle Migrationskosten M plus Kapazitätsstufen nach Abschluss (hier keine)
+    assert det["MF"]["skalierung_migration"][0] == pytest.approx(I_MONO, rel=1e-9)
+
+
+def test_committed_equals_cutoff_without_migration():
+    p = base(h=1e9)
+    assert present_values(p, 0.3, horizon="committed")[1][0] == pytest.approx(
+        present_values(p, 0.3)[1][0])
+
+
+def test_proactive_trigger_starts_earlier():
+    p = base(h=5.0, d=2.0)
+    _, _, reac = present_values(p, 0.6, detail=True)
+    _, _, proa = present_values(p, 0.6, detail=True, trigger="proactive")
+    assert proa["migrationsstart_jahr"][0] < reac["migrationsstart_jahr"][0]
+    # vorausschauend: Abschluss spätestens bei Erreichen der Kapazitätsgrenze
+    assert proa["migrationsende_jahr"][0] <= np.log(5.0) / np.log(1.6) + 1 / 12 + 1e-9
+
+
+def test_scale_anchor_override_scales_relative_quantities():
+    p = base()
+    p["I_M"] = 2 * I_MONO
+    _, _, det = present_values(p, 0.0, detail=True)
+    assert det["MF"]["investition"][0] == pytest.approx(2 * I_MONO)
+
+
+def test_srrc_recovers_dominant_input():
+    from src.analysis import srrc
+    rng = np.random.default_rng(5)
+    X = rng.uniform(size=(3000, 3))
+    y = 3 * X[:, 0] + X[:, 1]
+    beta, r2 = srrc(X, y)
+    assert beta[0] ** 2 > beta[1] ** 2 > beta[2] ** 2 and r2 > 0.9

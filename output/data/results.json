@@ -2,6 +2,7 @@
   "meta": {
     "seed": 20260926,
     "n_runs": 10000,
+    "pert_lambda": 4.0,
     "T": 5,
     "i": 0.05,
     "N0": 10000,
@@ -24,40 +25,43 @@
       "pandas": "3.0.6",
       "matplotlib": "3.11.2"
     },
-    "laufzeit_s": 527.5
+    "laufzeit_s": 256.3
   },
   "parameter": [
     {
       "symbol": "kappa",
-      "name": "Mehraufwand Erstentwicklung Microservices (Anteil von I_Mono)",
-      "low": 0.1,
-      "mode": 0.3,
-      "high": 0.6,
+      "name": "Mehraufwand Erstentwicklung Microservices (Anteil von I_M)",
+      "low": 0.0,
+      "mode": 0.25,
+      "high": 0.3,
       "unit": "–",
-      "origin": "relation_belegt",
-      "source": "richards2020; razzaq2023 (höhere Anfangsinvestition)",
+      "origin": "hergeleitet",
+      "cite": "\\textcite[S.~30]{taibi2017}",
+      "note": "Quelle: 24 % der Befragten 0–10 %, 76 % 20–30 % Mehraufwand",
       "group": "investition"
     },
     {
       "symbol": "w",
-      "name": "Wartungskosten p. a. im Ausgangszustand (Anteil von I_Mono)",
+      "name": "Wartungskosten p. a. im Ausgangszustand (Anteil von I_M)",
       "low": 0.15,
       "mode": 0.2,
       "high": 0.3,
       "unit": "–",
       "origin": "gesetzt",
-      "source": "Annahme; Wartungswachstum lehman1980",
+      "cite": "Annahme",
+      "note": "",
       "group": "betrieb"
     },
     {
       "symbol": "omega",
-      "name": "Wartungsmehraufwand Microservices im Ausgangszustand",
-      "low": 0.1,
-      "mode": 0.3,
-      "high": 0.6,
+      "name": "Entwicklungs- und Wartungsmehraufwand Microservices",
+      "low": 0.05,
+      "mode": 0.2,
+      "high": 0.4,
       "unit": "–",
       "origin": "relation_belegt",
-      "source": "soldani2018; razzaq2023 (Betriebs-/DevOps-Overhead)",
+      "cite": "\\textcite[S.~27]{taibi2017}",
+      "note": "Quelle: Mehraufwand von knapp 20 %; Breite gesetzt",
       "group": "betrieb"
     },
     {
@@ -67,8 +71,9 @@
       "mode": 0.6,
       "high": 0.8,
       "unit": "–",
-      "origin": "relation_belegt",
-      "source": "richards2020; comstock2011 (Kopplung, Skalenunwirtschaftlichkeit)",
+      "origin": "gesetzt",
+      "cite": "Annahme",
+      "note": "Richtung γ_M > γ_S aus Kopplungsargument (Kap. 2.1)",
       "group": "betrieb"
     },
     {
@@ -78,8 +83,9 @@
       "mode": 0.35,
       "high": 0.5,
       "unit": "–",
-      "origin": "relation_belegt",
-      "source": "richards2020 (Entkopplung)",
+      "origin": "gesetzt",
+      "cite": "Annahme",
+      "note": "",
       "group": "betrieb"
     },
     {
@@ -90,18 +96,20 @@
       "high": 20000,
       "unit": "EUR/a",
       "origin": "gesetzt",
-      "source": "Annahme",
+      "cite": "Annahme",
+      "note": "",
       "group": "betrieb"
     },
     {
       "symbol": "Phi",
-      "name": "Plattform-Grundlast Microservices p. a. (zusätzlich zu F_M)",
+      "name": "Plattform-Grundlast Microservices p. a. (Werkzeuge, Betrieb)",
       "low": 20000,
       "mode": 40000,
       "high": 80000,
       "unit": "EUR/a",
-      "origin": "relation_belegt",
-      "source": "soldani2018 (Orchestrierung, Observability); Höhe gesetzt",
+      "origin": "gesetzt",
+      "cite": "Annahme; Richtung: \\textcite[S.~27]{taibi2017}",
+      "note": "keine begutachteten Zahlenwerte; Varianten Φ niedrig/hoch",
       "group": "betrieb"
     },
     {
@@ -112,18 +120,20 @@
       "high": 45000,
       "unit": "EUR/a",
       "origin": "gesetzt",
-      "source": "Annahme",
+      "cite": "Annahme",
+      "note": "",
       "group": "betrieb"
     },
     {
       "symbol": "psi",
       "name": "relative Abweichung lastabhängiger Infrastrukturkosten Microservices",
-      "low": -0.4,
+      "low": -0.15,
       "mode": 0.0,
-      "high": 0.3,
+      "high": 0.5,
       "unit": "–",
-      "origin": "hergeleitet",
-      "source": "villamizar2017 (günstiger) vs. ueda2016, blinowski2022 (teurer)",
+      "origin": "relation_belegt",
+      "cite": "\\textcite[S.~182]{villamizar2016}; \\textcite[S.~20364--20365]{blinowski2022}",
+      "note": "−13,4 % (Villamizar) bis Durchsatznachteil Faktor 1,37 bis > 2 (Blinowski); Modus 0",
       "group": "betrieb"
     },
     {
@@ -134,7 +144,8 @@
       "high": 1.4,
       "unit": "–",
       "origin": "relation_belegt",
-      "source": "gunther2007 (nichtlineare Skalierung); blinowski2022 (≤ 1 möglich)",
+      "cite": "\\textcite[S.~20360, 20369]{blinowski2022}",
+      "note": "Kosten steigen jenseits bestimmter Konfigurationen stark; Scale-up teils effizient",
       "group": "betrieb"
     },
     {
@@ -145,7 +156,8 @@
       "high": 1.05,
       "unit": "–",
       "origin": "relation_belegt",
-      "source": "hassan2022 (horizontale Skalierung annähernd proportional)",
+      "cite": "\\textcite[S.~20365]{blinowski2022}",
+      "note": "Durchsatz steigt annähernd linear mit Instanzen",
       "group": "betrieb"
     },
     {
@@ -156,7 +168,8 @@
       "high": 50000,
       "unit": "EUR",
       "origin": "gesetzt",
-      "source": "Annahme",
+      "cite": "Annahme",
+      "note": "",
       "group": "betrieb"
     },
     {
@@ -167,40 +180,43 @@
       "high": 20.0,
       "unit": "–",
       "origin": "gesetzt",
-      "source": "Existenz: gunther2007; Höhe gesetzt",
+      "cite": "Annahme",
+      "note": "Existenz einer Grenze: Villamizar S. 180, Blinowski S. 20360; Höhe gesetzt",
       "group": "kapazitaet_migration"
     },
     {
       "symbol": "mu",
-      "name": "Migrationskosten (Vielfaches von I_Mono)",
+      "name": "Migrationskosten (Vielfaches von I_M)",
       "low": 0.5,
       "mode": 1.0,
       "high": 2.0,
       "unit": "–",
       "origin": "gesetzt",
-      "source": "Annahme; Größenordnung gouigoux2017, faustino2024",
+      "cite": "Annahme",
+      "note": "Fallwerte (Gouigoux & Tamzalit 2017; Fritzsch et al. 2019, S. 486) nicht übertragbar",
       "group": "kapazitaet_migration"
     },
     {
       "symbol": "d",
       "name": "Migrationsdauer",
-      "low": 1.0,
+      "low": 1.5,
       "mode": 2.0,
-      "high": 3.0,
+      "high": 4.0,
       "unit": "Jahre",
       "origin": "hergeleitet",
-      "source": "fritzsch2019 (1,5 bis über 3 Jahre)",
+      "cite": "\\textcite[S.~484, 487]{fritzsch2019}",
+      "note": "1,5 bis über 3 Jahre; laufende Migrationen bis 4 Jahre erwartet",
       "group": "kapazitaet_migration"
     }
   ],
   "basisfall": {
     "niedrig": {
       "MS": {
-        "investition": 520000.0,
-        "wartung": 480232.58724040346,
+        "investition": 500000.0,
+        "wartung": 443291.6189911417,
         "infrastruktur": 379320.3705844034,
         "skalierung_migration": 0.0,
-        "gesamt": 1379552.957824807
+        "gesamt": 1322611.989575545
       },
       "MF": {
         "investition": 400000.0,
@@ -213,11 +229,11 @@
     },
     "mittel": {
       "MS": {
-        "investition": 520000.0,
-        "wartung": 540365.4632530506,
+        "investition": 500000.0,
+        "wartung": 498798.8891566621,
         "infrastruktur": 439370.2452464633,
         "skalierung_migration": 16588.394276901512,
-        "gesamt": 1516324.1027764154
+        "gesamt": 1454757.528680027
       },
       "MF": {
         "investition": 400000.0,
@@ -230,11 +246,11 @@
     },
     "stark": {
       "MS": {
-        "investition": 520000.0,
-        "wartung": 707566.938843384,
+        "investition": 500000.0,
+        "wartung": 653138.7127785085,
         "infrastruktur": 713769.4164851919,
         "skalierung_migration": 51922.83289198354,
-        "gesamt": 1993259.1882205592
+        "gesamt": 1918830.962155684
       },
       "MF": {
         "investition": 400000.0,
@@ -251,22 +267,22 @@
       "g": 0.05,
       "p": 0.3,
       "K_MS": {
-        "median": 1425449.5635026013,
-        "q05": 1267581.4084287453,
-        "q95": 1602584.9957499362,
-        "mean": 1429047.94573293
+        "median": 1355345.9300691956,
+        "q05": 1214434.9245090396,
+        "q95": 1515599.597641079,
+        "mean": 1358478.7580315354
       },
       "K_MF": {
-        "median": 1003093.5893466377,
-        "q05": 914542.4808533911,
-        "q95": 1110126.9018036819,
-        "mean": 1006836.0495163406
+        "median": 1002906.9275647548,
+        "q05": 914283.1572150455,
+        "q95": 1109952.6934542703,
+        "mean": 1006728.0740943657
       },
       "delta": {
-        "median": -420543.2073372531,
-        "q05": -549981.8302531489,
-        "q95": -302059.34249998507,
-        "mean": -422211.89621658914
+        "median": -350832.7312480121,
+        "q05": -457531.6597954745,
+        "q95": -253264.3737706711,
+        "mean": -351750.68393717
       },
       "P_MS_guenstiger": 0.0
     },
@@ -274,79 +290,89 @@
       "g": 0.2,
       "p": 0.5,
       "K_MS": {
-        "median": 1567952.6995202086,
-        "q05": 1389751.66667159,
-        "q95": 1767235.0602640577,
-        "mean": 1572142.8554277308
+        "median": 1497628.4092951752,
+        "q05": 1339074.9351313652,
+        "q95": 1678916.8443002044,
+        "mean": 1500907.8982714924
       },
       "K_MF": {
-        "median": 1173164.045294283,
-        "q05": 1056862.6827574547,
-        "q95": 1316405.9413814112,
-        "mean": 1178343.9849916787
+        "median": 1173263.3092220693,
+        "q05": 1055994.1521692595,
+        "q95": 1316275.8548329049,
+        "mean": 1178034.256085396
       },
       "delta": {
-        "median": -393276.0752909995,
-        "q05": -537827.1906467603,
-        "q95": -256464.1915702055,
-        "mean": -393798.87043605215
+        "median": -321494.7590595032,
+        "q05": -444862.9784845576,
+        "q95": -206366.93618147288,
+        "mean": -322873.6421860964
       },
-      "P_MS_guenstiger": 0.0001
+      "P_MS_guenstiger": 0.0
     },
     "stark": {
       "g": 0.6,
       "p": 0.2,
       "K_MS": {
-        "median": 2061452.5317697413,
-        "q05": 1791487.5626129054,
-        "q95": 2373159.23259063,
-        "mean": 2068562.3077553106
+        "median": 1998961.7314243983,
+        "q05": 1747402.5690839253,
+        "q95": 2283253.510241793,
+        "mean": 2003682.329446376
       },
       "K_MF": {
-        "median": 2103215.802220738,
-        "q05": 1721210.5004972916,
-        "q95": 2533071.320939679,
-        "mean": 2112211.25198684
+        "median": 2088822.4933621539,
+        "q05": 1714432.9594651866,
+        "q95": 2534205.7471959577,
+        "mean": 2103201.0024422226
       },
       "delta": {
-        "median": 42698.377560322406,
-        "q05": -340210.9165756142,
-        "q95": 437028.31275804143,
-        "mean": 43648.94423152947
+        "median": 96536.96329753578,
+        "q05": -264942.366110214,
+        "q95": 479845.8546001705,
+        "mean": 99518.67299584669
       },
-      "P_MS_guenstiger": 0.5671
+      "P_MS_guenstiger": 0.6569
     },
     "EV": {
       "EV_MS": {
-        "median": 1623988.0360309612,
-        "q05": 1437277.9122865037,
-        "q95": 1833439.6477913705,
-        "mean": 1628498.2729848064
+        "median": 1555577.1078496329,
+        "q05": 1387576.613763455,
+        "q95": 1745965.9351670481,
+        "mean": 1558734.0424344821
       },
       "EV_MF": {
-        "median": 1309066.7247536872,
-        "q05": 1162892.8575530148,
-        "q95": 1479019.5372443302,
-        "mean": 1313665.0577481093
+        "median": 1307234.2910465952,
+        "q05": 1161218.107168757,
+        "q95": 1477383.6287474462,
+        "mean": 1311675.7507594523
       },
       "delta": {
-        "median": -315143.00294574536,
-        "q05": -480052.6009273656,
-        "q95": -156741.6170834645,
-        "mean": -314833.21523669694
+        "median": -245168.67062402342,
+        "q05": -391887.8942577946,
+        "q95": -107345.07289774445,
+        "mean": -247058.2916750299
       },
-      "anteil_MF_guenstiger": 0.9995
+      "anteil_MF_guenstiger": 0.9993
     }
   },
   "hypothesen": {
     "H1": {
       "kriterium": "Anteil EV(MF) < EV(MS) >= 0.8",
-      "wert": 0.9995,
+      "wert": 0.9993,
+      "ci": {
+        "se": 0.00026448251359967713,
+        "lo": 0.9987816142733446,
+        "hi": 0.9998183857266554
+      },
       "bestaetigt": true
     },
     "H2": {
       "kriterium": "P(MS günstiger | g = 60 %) > 0.5",
-      "wert": 0.5671,
+      "wert": 0.6569,
+      "ci": {
+        "se": 0.004747445523647428,
+        "lo": 0.6475950067736511,
+        "hi": 0.666204993226349
+      },
       "bestaetigt": true
     },
     "H3": {
@@ -363,210 +389,296 @@
           "gamma_M": 3,
           "psi": 4,
           "gamma_S": 5,
-          "omega": 6,
-          "mu": 7,
-          "Phi": 8,
-          "kappa": 9,
-          "beta_S": 10,
-          "V": 11,
-          "s": 12,
+          "mu": 6,
+          "Phi": 7,
+          "omega": 8,
+          "beta_S": 9,
+          "kappa": 10,
+          "s": 11,
+          "V": 12,
           "d": 13,
           "w": 14,
           "F_M": 15
         },
         "bestaetigt": false
+      },
+      "r2_rangregression": {
+        "dEV": 0.9233587134839351,
+        "dK_stark": 0.9066916711637278
       }
     }
   },
   "breakeven": {
     "kurve_schwellen": {
-      "g_bei_P20": 0.45894736842105266,
-      "g_bei_P50": 0.5765116279069767,
-      "g_bei_P80": 0.6993
+      "g_bei_P20": 0.43635983263598327,
+      "g_bei_P50": 0.546923076923077,
+      "g_bei_P80": 0.6620809248554914
     },
     "je_ziehung": {
-      "anteil_mit_breakeven_bis_gmax": 0.9874,
+      "anteil_mit_breakeven_bis_gmax": 0.9898,
+      "anteil_nicht_eindeutig": 0.0274,
       "g_max": 1.5,
       "g_star": {
-        "median": 0.5750000000000001,
-        "q05": 0.36,
-        "q95": 0.8567500000000018,
-        "mean": 0.5880889203970023
+        "median": 0.545,
+        "q05": 0.34,
+        "q95": 0.8150000000000001,
+        "mean": 0.5562522731865024
       },
       "g_kapazitaet": {
         "median": 0.45689080163454,
-        "q05": 0.23477658425695838,
-        "q95": 0.6637896133064863,
-        "mean": 0.45424069735886125
+        "q05": 0.2337966822713911,
+        "q95": 0.6645180743863737,
+        "mean": 0.4542287649635369
       },
-      "spearman_gstar_gcap": 0.6824032492755497,
+      "spearman_gstar_gcap": 0.7067582204756634,
       "g_star_minus_g_cap": {
-        "median": 0.1157745279533923,
-        "q05": -0.03654196361916961,
-        "q95": 0.3480626220891752,
-        "mean": 0.1337626743536002
+        "median": 0.09411660670536656,
+        "q05": -0.07762676779055547,
+        "q95": 0.2801945048390582,
+        "mean": 0.10248752882929461
       }
+    }
+  },
+  "migration": {
+    "anteile": {
+      "niedrig": {
+        "ausgeloest": 0.0,
+        "abgeschlossen": 0.0
+      },
+      "mittel": {
+        "ausgeloest": 0.0207,
+        "abgeschlossen": 0.0
+      },
+      "stark": {
+        "ausgeloest": 0.852,
+        "abgeschlossen": 0.1361
+      }
+    },
+    "zerlegung_stark": {
+      "P_MS_ausgeloest": 0.7226525821596245,
+      "P_MS_nicht_ausgeloest": 0.27837837837837837,
+      "g_bei_P50_ohne_grenze": 0.6860280373831776
     }
   },
   "sensitivitaet": {
     "prcc": [
       {
         "symbol": "Phi",
-        "prcc_dEV": -0.8616722449884745,
-        "prcc_dK_stark": -0.44966781189009286
-      },
-      {
-        "symbol": "omega",
-        "prcc_dEV": -0.8322025041433464,
-        "prcc_dK_stark": -0.5491635078962069
-      },
-      {
-        "symbol": "kappa",
-        "prcc_dEV": -0.7999413700368333,
-        "prcc_dK_stark": -0.42385146851250827
-      },
-      {
-        "symbol": "psi",
-        "prcc_dEV": -0.7617850038597302,
-        "prcc_dK_stark": -0.6226418333404182
+        "prcc_dEV": -0.8885524231820754,
+        "prcc_dK_stark": -0.472019659003828,
+        "srrc2_dEV": 0.2878937180370221,
+        "srrc2_dK_stark": 0.02678626668811505,
+        "rang_boot_lo": 1,
+        "rang_boot_hi": 1
       },
       {
         "symbol": "h",
-        "prcc_dEV": -0.7396584614112995,
-        "prcc_dK_stark": -0.8870141341830716
+        "prcc_dEV": -0.7721061867170793,
+        "prcc_dK_stark": -0.8992247650161096,
+        "srrc2_dEV": 0.11328661157297781,
+        "srrc2_dK_stark": 0.39473965611221823,
+        "rang_boot_lo": 2,
+        "rang_boot_hi": 3
+      },
+      {
+        "symbol": "omega",
+        "prcc_dEV": -0.7677132522858892,
+        "prcc_dK_stark": -0.45582429846166056,
+        "srrc2_dEV": 0.11019088429331082,
+        "srrc2_dK_stark": 0.02451253938470534,
+        "rang_boot_lo": 2,
+        "rang_boot_hi": 3
+      },
+      {
+        "symbol": "psi",
+        "prcc_dEV": -0.7568537023787011,
+        "prcc_dK_stark": -0.5990118311389276,
+        "srrc2_dEV": 0.10291948866979872,
+        "srrc2_dK_stark": 0.05229042707946969,
+        "rang_boot_lo": 4,
+        "rang_boot_hi": 4
       },
       {
         "symbol": "gamma_M",
-        "prcc_dEV": 0.6793217412932905,
-        "prcc_dK_stark": 0.7172395910913453
+        "prcc_dEV": 0.7323896578968113,
+        "prcc_dK_stark": 0.7527145701689101,
+        "srrc2_dEV": 0.0888180447565121,
+        "srrc2_dK_stark": 0.12217260189755681,
+        "rang_boot_lo": 5,
+        "rang_boot_hi": 5
       },
       {
         "symbol": "beta_M",
-        "prcc_dEV": 0.6680635720646585,
-        "prcc_dK_stark": 0.7682567675377615
+        "prcc_dEV": 0.7157256379495025,
+        "prcc_dK_stark": 0.7981756202250658,
+        "srrc2_dEV": 0.08061741129668183,
+        "srrc2_dK_stark": 0.1640476616701922,
+        "rang_boot_lo": 6,
+        "rang_boot_hi": 6
+      },
+      {
+        "symbol": "kappa",
+        "prcc_dEV": -0.6373368405815747,
+        "prcc_dK_stark": -0.2801315114633984,
+        "srrc2_dEV": 0.05249350978005307,
+        "srrc2_dK_stark": 0.007955781405870107,
+        "rang_boot_lo": 7,
+        "rang_boot_hi": 7
       },
       {
         "symbol": "gamma_S",
-        "prcc_dEV": -0.5680317656713205,
-        "prcc_dK_stark": -0.5600254371180269
+        "prcc_dEV": -0.5763005688904279,
+        "prcc_dK_stark": -0.5502581860010392,
+        "srrc2_dEV": 0.03816037105203847,
+        "srrc2_dK_stark": 0.04057277888662454,
+        "rang_boot_lo": 8,
+        "rang_boot_hi": 8
       },
       {
         "symbol": "mu",
-        "prcc_dEV": 0.3151180727112498,
-        "prcc_dK_stark": 0.5054618844595978
-      },
-      {
-        "symbol": "w",
-        "prcc_dEV": -0.28464913627858585,
-        "prcc_dK_stark": 0.09397819212587011
-      },
-      {
-        "symbol": "s",
-        "prcc_dEV": -0.26742403035751855,
-        "prcc_dK_stark": -0.2525994930425312
+        "prcc_dEV": 0.33429015151834063,
+        "prcc_dK_stark": 0.493172733692035,
+        "srrc2_dEV": 0.009648248063057521,
+        "srrc2_dK_stark": 0.030006979205023026,
+        "rang_boot_lo": 9,
+        "rang_boot_hi": 10
       },
       {
         "symbol": "beta_S",
-        "prcc_dEV": -0.250388081176327,
-        "prcc_dK_stark": -0.31816378702483156
+        "prcc_dEV": -0.32852301244098214,
+        "prcc_dK_stark": -0.3795511537361008,
+        "srrc2_dEV": 0.009288292580040622,
+        "srrc2_dK_stark": 0.01573109579891678,
+        "rang_boot_lo": 9,
+        "rang_boot_hi": 10
+      },
+      {
+        "symbol": "s",
+        "prcc_dEV": -0.2945255765374738,
+        "prcc_dK_stark": -0.27858226371020506,
+        "srrc2_dEV": 0.007283399325784784,
+        "srrc2_dK_stark": 0.007854690203515077,
+        "rang_boot_lo": 11,
+        "rang_boot_hi": 11
       },
       {
         "symbol": "V",
-        "prcc_dEV": 0.21519687481332547,
-        "prcc_dK_stark": 0.2762921767794699
+        "prcc_dEV": 0.1814663315812824,
+        "prcc_dK_stark": 0.2692077805715495,
+        "srrc2_dEV": 0.002611990934703686,
+        "srrc2_dK_stark": 0.007296988181330234,
+        "rang_boot_lo": 12,
+        "rang_boot_hi": 12
       },
       {
         "symbol": "d",
-        "prcc_dEV": -0.08858162214210863,
-        "prcc_dK_stark": -0.16508014296377785
+        "prcc_dEV": -0.12375105022223062,
+        "prcc_dK_stark": -0.21829387404788714,
+        "srrc2_dEV": 0.0011942248965778213,
+        "srrc2_dK_stark": 0.004677686384217974,
+        "rang_boot_lo": 13,
+        "rang_boot_hi": 13
+      },
+      {
+        "symbol": "w",
+        "prcc_dEV": -0.0756652207979155,
+        "prcc_dK_stark": 0.1998368001613695,
+        "srrc2_dEV": 0.0004419529797558911,
+        "srrc2_dK_stark": 0.0038868491612937353,
+        "rang_boot_lo": 14,
+        "rang_boot_hi": 14
       },
       {
         "symbol": "F_M",
-        "prcc_dEV": 0.004320801300918735,
-        "prcc_dK_stark": 0.013256633755055237
+        "prcc_dEV": 0.014521200884053967,
+        "prcc_dK_stark": 0.013997256951734222,
+        "srrc2_dEV": 1.617804292453843e-05,
+        "srrc2_dK_stark": 1.8300287861149455e-05,
+        "rang_boot_lo": 15,
+        "rang_boot_hi": 15
       }
     ],
     "tornado": {
-      "dEV_basis": -276393.1476763395,
+      "dEV_basis": -213641.92494039168,
       "zeilen": [
         {
           "symbol": "Phi",
           "low": 20000,
           "high": 80000,
-          "dEV_low": -192704.30127056153,
-          "dEV_high": -443770.8404878957,
-          "spannweite": 251066.53921733418,
-          "vorzeichenwechsel": false
-        },
-        {
-          "symbol": "omega",
-          "low": 0.1,
-          "high": 0.6,
-          "dEV_low": -190890.70220444363,
-          "dEV_high": -404646.8158841834,
-          "spannweite": 213756.11367973976,
-          "vorzeichenwechsel": false
-        },
-        {
-          "symbol": "kappa",
-          "low": 0.1,
-          "high": 0.6,
-          "dEV_low": -196393.14767633955,
-          "dEV_high": -396393.1476763395,
-          "spannweite": 199999.99999999994,
+          "dEV_low": -129953.0785346136,
+          "dEV_high": -381019.61775194795,
+          "spannweite": 251066.53921733436,
           "vorzeichenwechsel": false
         },
         {
           "symbol": "h",
           "low": 2.0,
           "high": 20.0,
-          "dEV_low": -156845.64778633474,
-          "dEV_high": -334803.7528649911,
-          "spannweite": 177958.10507865634,
+          "dEV_low": -98042.83624778604,
+          "dEV_high": -272052.53012904327,
+          "spannweite": 174009.69388125723,
           "vorzeichenwechsel": false
         },
         {
           "symbol": "psi",
-          "low": -0.4,
-          "high": 0.3,
-          "dEV_low": -177997.75354979545,
-          "dEV_high": -350189.6932712476,
-          "spannweite": 172191.93972145216,
+          "low": -0.15,
+          "high": 0.5,
+          "dEV_low": -176743.6521429377,
+          "dEV_high": -336636.16759857174,
+          "spannweite": 159892.51545563404,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "omega",
+          "low": 0.05,
+          "high": 0.4,
+          "dEV_low": -149515.09083646972,
+          "dEV_high": -299144.37041228754,
+          "spannweite": 149629.2795758178,
           "vorzeichenwechsel": false
         },
         {
           "symbol": "beta_M",
           "low": 0.9,
           "high": 1.4,
-          "dEV_low": -321773.4579701424,
-          "dEV_high": -175536.57711127875,
-          "spannweite": 146236.88085886367,
+          "dEV_low": -259022.23523419458,
+          "dEV_high": -112785.35437533092,
+          "spannweite": 146236.88085886365,
           "vorzeichenwechsel": false
         },
         {
           "symbol": "gamma_M",
           "low": 0.4,
           "high": 0.8,
-          "dEV_low": -337329.81357133883,
-          "dEV_high": -197372.44635811355,
-          "spannweite": 139957.36721322528,
+          "dEV_low": -274578.59083539096,
+          "dEV_high": -134621.22362216574,
+          "spannweite": 139957.36721322522,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "kappa",
+          "low": 0.0,
+          "high": 0.3,
+          "dEV_low": -113641.92494039166,
+          "dEV_high": -233641.92494039168,
+          "spannweite": 120000.00000000001,
           "vorzeichenwechsel": false
         },
         {
           "symbol": "gamma_S",
           "low": 0.2,
           "high": 0.5,
-          "dEV_low": -231051.79534725627,
-          "dEV_high": -330485.5400793876,
-          "spannweite": 99433.74473213134,
+          "dEV_low": -171788.36894431483,
+          "dEV_high": -263573.36408166675,
+          "spannweite": 91784.99513735191,
           "vorzeichenwechsel": false
         },
         {
           "symbol": "mu",
           "low": 0.5,
           "high": 2.0,
-          "dEV_low": -300730.89983827766,
-          "dEV_high": -227717.64335246303,
+          "dEV_low": -237979.67710232985,
+          "dEV_high": -164966.4206165152,
           "spannweite": 73013.25648581464,
           "vorzeichenwechsel": false
         },
@@ -574,53 +686,53 @@
           "symbol": "beta_S",
           "low": 0.85,
           "high": 1.05,
-          "dEV_low": -256864.0113842937,
-          "dEV_high": -299007.41578308115,
-          "spannweite": 42143.40439878745,
+          "dEV_low": -194112.7886483459,
+          "dEV_high": -236256.19304713322,
+          "spannweite": 42143.40439878733,
           "vorzeichenwechsel": false
         },
         {
           "symbol": "s",
           "low": 5000,
           "high": 50000,
-          "dEV_low": -262384.0748887038,
-          "dEV_high": -304411.29325161065,
+          "dEV_low": -199632.852152756,
+          "dEV_high": -241660.07051566284,
           "spannweite": 42027.21836290683,
           "vorzeichenwechsel": false
         },
         {
-          "symbol": "w",
-          "low": 0.15,
-          "high": 0.3,
-          "dEV_low": -262824.17835383717,
-          "dEV_high": -303531.0863213448,
-          "spannweite": 40706.90796750761,
+          "symbol": "d",
+          "low": 1.5,
+          "high": 4.0,
+          "dEV_low": -197416.7568324328,
+          "dEV_high": -237979.67710232985,
+          "spannweite": 40562.92026989706,
           "vorzeichenwechsel": false
         },
         {
           "symbol": "V",
           "low": 20000,
           "high": 45000,
-          "dEV_low": -288147.7082824054,
-          "dEV_high": -258761.30676724078,
-          "spannweite": 29386.401515164616,
+          "dEV_low": -225396.4855464577,
+          "dEV_high": -196010.08403129282,
+          "spannweite": 29386.40151516488,
           "vorzeichenwechsel": false
         },
         {
-          "symbol": "d",
-          "low": 1.0,
-          "high": 3.0,
-          "dEV_low": -273878.8984804642,
-          "dEV_high": -292618.31578429823,
-          "spannweite": 18739.417303834052,
+          "symbol": "w",
+          "low": 0.15,
+          "high": 0.3,
+          "dEV_low": -210760.76130187613,
+          "dEV_high": -219404.25221742253,
+          "spannweite": 8643.490915546397,
           "vorzeichenwechsel": false
         },
         {
           "symbol": "F_M",
           "low": 6000,
           "high": 20000,
-          "dEV_low": -276393.14767633943,
-          "dEV_high": -276393.1476763394,
+          "dEV_low": -213641.92494039162,
+          "dEV_high": -213641.92494039156,
           "spannweite": 5.820766091346741e-11,
           "vorzeichenwechsel": false
         }
@@ -632,7 +744,7 @@
         "anteil_MF_guenstiger_EV": 1.0,
         "P_MS_niedrig": 0.0,
         "P_MS_mittel": 0.0,
-        "P_MS_stark": 0.0153,
+        "P_MS_stark": 0.0255,
         "g_bei_P50": null
       },
       {
@@ -640,116 +752,367 @@
         "anteil_MF_guenstiger_EV": 1.0,
         "P_MS_niedrig": 0.0,
         "P_MS_mittel": 0.0,
-        "P_MS_stark": 0.1709,
-        "g_bei_P50": 0.7867804878048781
+        "P_MS_stark": 0.2234,
+        "g_bei_P50": 0.744919540229885
       },
       {
         "T": 5,
-        "anteil_MF_guenstiger_EV": 0.9995,
+        "anteil_MF_guenstiger_EV": 0.9993,
         "P_MS_niedrig": 0.0,
-        "P_MS_mittel": 0.0001,
-        "P_MS_stark": 0.5671,
-        "g_bei_P50": 0.5764705882352941
+        "P_MS_mittel": 0.0,
+        "P_MS_stark": 0.6569,
+        "g_bei_P50": 0.5470703764320786
       },
       {
         "T": 6,
-        "anteil_MF_guenstiger_EV": 0.9896,
+        "anteil_MF_guenstiger_EV": 0.9716,
         "P_MS_niedrig": 0.0,
-        "P_MS_mittel": 0.0039,
-        "P_MS_stark": 0.8706,
-        "g_bei_P50": 0.4571021992238034
+        "P_MS_mittel": 0.0053,
+        "P_MS_stark": 0.9128,
+        "g_bei_P50": 0.4324257425742574
       },
       {
         "T": 7,
-        "anteil_MF_guenstiger_EV": 0.9465,
+        "anteil_MF_guenstiger_EV": 0.8816,
         "P_MS_niedrig": 0.0,
-        "P_MS_mittel": 0.0149,
-        "P_MS_stark": 0.9334,
-        "g_bei_P50": 0.3811499436302142
+        "P_MS_mittel": 0.0238,
+        "P_MS_stark": 0.9668,
+        "g_bei_P50": 0.35855541718555417
       },
       {
         "T": 8,
-        "anteil_MF_guenstiger_EV": 0.9195,
+        "anteil_MF_guenstiger_EV": 0.8297,
         "P_MS_niedrig": 0.0,
-        "P_MS_mittel": 0.0324,
-        "P_MS_stark": 0.9385,
-        "g_bei_P50": 0.32923943661971833
+        "P_MS_mittel": 0.0526,
+        "P_MS_stark": 0.9715,
+        "g_bei_P50": 0.30815859030837006
       },
       {
         "T": 9,
-        "anteil_MF_guenstiger_EV": 0.8967,
+        "anteil_MF_guenstiger_EV": 0.7918,
         "P_MS_niedrig": 0.0,
-        "P_MS_mittel": 0.0639,
-        "P_MS_stark": 0.9386,
-        "g_bei_P50": 0.29199309749784297
+        "P_MS_mittel": 0.1087,
+        "P_MS_stark": 0.9716,
+        "g_bei_P50": 0.27146360153256704
       },
       {
         "T": 10,
-        "anteil_MF_guenstiger_EV": 0.8581,
+        "anteil_MF_guenstiger_EV": 0.7353,
         "P_MS_niedrig": 0.0,
-        "P_MS_mittel": 0.1284,
-        "P_MS_stark": 0.9386,
-        "g_bei_P50": 0.26343883661248935
+        "P_MS_mittel": 0.2007,
+        "P_MS_stark": 0.9716,
+        "g_bei_P50": 0.2436113125453227
       }
     ],
     "p_stark": {
-      "p_stark_H1_kippt_unter_80": 0.5965217391304347,
-      "p_stark_MF_unter_50": 0.903913043478261,
-      "p_stark_mean_dEV_null": 0.9025916507615811
+      "p_stark_H1_kippt_unter_80": 0.5055737704918032,
+      "p_stark_MF_unter_50": 0.7740259740259741,
+      "p_stark_mean_dEV_null": 0.7702820830222145
     },
     "zins": [
       {
         "i": 0.0,
-        "anteil_MF_guenstiger_EV": 0.9991,
-        "P_MS_stark": 0.6404
+        "anteil_MF_guenstiger_EV": 0.9974,
+        "P_MS_stark": 0.7145
       },
       {
         "i": 0.05,
-        "anteil_MF_guenstiger_EV": 0.9995,
-        "P_MS_stark": 0.5671
+        "anteil_MF_guenstiger_EV": 0.9993,
+        "P_MS_stark": 0.6569
       },
       {
         "i": 0.1,
-        "anteil_MF_guenstiger_EV": 0.9998,
-        "P_MS_stark": 0.489
+        "anteil_MF_guenstiger_EV": 0.9995,
+        "P_MS_stark": 0.591
       }
-    ]
+    ],
+    "monotonie": {
+      "h": 0.9975,
+      "d": 0.7515,
+      "mu": 1.0,
+      "Phi": 1.0,
+      "kappa": 1.0
+    },
+    "prcc_rang_gleiche_breite": {
+      "beta_M": 1,
+      "psi": 2,
+      "gamma_M": 3,
+      "beta_S": 4,
+      "Phi": 5,
+      "gamma_S": 6,
+      "kappa": 7,
+      "omega": 8,
+      "h": 9,
+      "mu": 10,
+      "V": 11,
+      "d": 12,
+      "s": 13,
+      "w": 14,
+      "F_M": 15
+    }
   },
+  "varianten": [
+    {
+      "key": "basis",
+      "label": "Basisfall (Tab. 2)",
+      "H1": 0.9993,
+      "H2": 0.6569,
+      "H2_ci": {
+        "se": 0.004747445523647428,
+        "lo": 0.6475950067736511,
+        "hi": 0.666204993226349
+      },
+      "mean_dEV": -247058.29167502985,
+      "g_P20": 0.43616740088105727,
+      "g_P50": 0.5470703764320786,
+      "g_P80": 0.6621818181818182
+    },
+    {
+      "key": "verpflichtung",
+      "label": "Beschlossene Migrationskosten voll angerechnet",
+      "H1": 0.9918,
+      "H2": 0.8414,
+      "H2_ci": {
+        "se": 0.0036530266902939537,
+        "lo": 0.8342400676870239,
+        "hi": 0.8485599323129762
+      },
+      "mean_dEV": -218639.18361555948,
+      "g_P20": 0.3604621848739496,
+      "g_P50": 0.4686238532110092,
+      "g_P80": 0.5804716981132075
+    },
+    {
+      "key": "vorausschauend",
+      "label": "Vorausschauende Migration",
+      "H1": 0.9739,
+      "H2": 0.9761,
+      "H2_ci": {
+        "se": 0.0015273765089197893,
+        "lo": 0.9731063420425172,
+        "hi": 0.9790936579574827
+      },
+      "mean_dEV": -195650.2178340124,
+      "g_P20": 0.2873809523809524,
+      "g_P50": 0.3796521739130435,
+      "g_P80": 0.46243093922651934
+    },
+    {
+      "key": "beides",
+      "label": "Voll angerechnet und vorausschauend",
+      "H1": 0.9389,
+      "H2": 0.9826,
+      "H2_ci": {
+        "se": 0.001307564147565999,
+        "lo": 0.9800371742707706,
+        "hi": 0.9851628257292294
+      },
+      "mean_dEV": -181827.4762741688,
+      "g_P20": 0.23954144620811288,
+      "g_P50": 0.3219806763285024,
+      "g_P80": 0.402
+    },
+    {
+      "key": "h_klein",
+      "label": "Kapazitätsreserve h: 2 / 4 / 10",
+      "H1": 0.998,
+      "H2": 0.869,
+      "H2_ci": {
+        "se": 0.0033740035566074914,
+        "lo": 0.8623869530290493,
+        "hi": 0.8756130469709507
+      },
+      "mean_dEV": -222898.85388217506,
+      "g_P20": 0.38363636363636366,
+      "g_P50": 0.46849936948297605,
+      "g_P80": 0.5656091954022989
+    },
+    {
+      "key": "h_gross",
+      "label": "Kapazitätsreserve h: 2 / 10 / 50",
+      "H1": 1.0,
+      "H2": 0.405,
+      "H2_ci": {
+        "se": 0.004908920451586071,
+        "lo": 0.3953785159148913,
+        "hi": 0.41462148408510874
+      },
+      "mean_dEV": -274397.9598940813,
+      "g_P20": 0.5218448637316562,
+      "g_P50": 0.6348421052631579,
+      "g_P80": 0.7997887323943662
+    },
+    {
+      "key": "phi_niedrig",
+      "label": "Plattform-Grundlast niedrig (verwaltete Dienste): 5 / 15 / 30 Tsd.",
+      "H1": 0.9638,
+      "H2": 0.8126,
+      "H2_ci": {
+        "se": 0.0039023228979673122,
+        "lo": 0.804951447119984,
+        "hi": 0.820248552880016
+      },
+      "mean_dEV": -130891.66090961776,
+      "g_P20": 0.37876984126984126,
+      "g_P50": 0.4711830985915493,
+      "g_P80": 0.5929805013927577
+    },
+    {
+      "key": "phi_hoch",
+      "label": "Plattform-Grundlast hoch (inkl. Betriebsstelle): 60 / 100 / 150 Tsd.",
+      "H1": 1.0,
+      "H2": 0.3477,
+      "H2_ci": {
+        "se": 0.004762401810011415,
+        "lo": 0.33836569245237763,
+        "hi": 0.3570343075476224
+      },
+      "mean_dEV": -496362.23143102304,
+      "g_P20": 0.5378016085790885,
+      "g_P50": 0.6546545454545455,
+      "g_P80": 0.7958181818181819
+    },
+    {
+      "key": "skala5",
+      "label": "Skalenanker I_M × 5 (2 Mio. EUR)",
+      "H1": 0.9613,
+      "H2": 0.8226,
+      "H2_ci": {
+        "se": 0.0038200685857717265,
+        "lo": 0.8151126655718874,
+        "hi": 0.8300873344281126
+      },
+      "mean_dEV": -524425.7632433955,
+      "g_P20": 0.37309473684210526,
+      "g_P50": 0.47019847328244274,
+      "g_P80": 0.5878167115902965
+    },
+    {
+      "key": "lambda2",
+      "label": "PERT λ = 2 (flacher)",
+      "H1": 0.9951,
+      "H2": 0.5763,
+      "H2_ci": {
+        "se": 0.004941440174685918,
+        "lo": 0.5666147772576157,
+        "hi": 0.5859852227423844
+      },
+      "mean_dEV": -261629.1647777824,
+      "g_P20": 0.43830917874396136,
+      "g_P50": 0.5691505791505792,
+      "g_P80": 0.715864406779661
+    },
+    {
+      "key": "lambda6",
+      "label": "PERT λ = 6 (spitzer)",
+      "H1": 0.9996,
+      "H2": 0.7036,
+      "H2_ci": {
+        "se": 0.004566695085069727,
+        "lo": 0.6946492776332633,
+        "hi": 0.7125507223667367
+      },
+      "mean_dEV": -240285.50371300033,
+      "g_P20": 0.4360842105263158,
+      "g_P50": 0.5394835007173602,
+      "g_P80": 0.6354621848739497
+    },
+    {
+      "key": "gleich",
+      "label": "Gleichverteilung",
+      "H1": 0.9839,
+      "H2": 0.4777,
+      "H2_ci": {
+        "se": 0.0049950246245639264,
+        "lo": 0.4679097517358547,
+        "hi": 0.48749024826414533
+      },
+      "mean_dEV": -297180.9973086945,
+      "g_P20": 0.4500534759358289,
+      "g_P50": 0.6112911392405063,
+      "g_P80": 0.8692561983471075
+    },
+    {
+      "key": "zins0",
+      "label": "Zinssatz 0 %",
+      "H1": 0.9974,
+      "H2": 0.7145,
+      "H2_ci": {
+        "se": 0.00451652244542192,
+        "lo": 0.705647616006973,
+        "hi": 0.723352383993027
+      },
+      "mean_dEV": -258595.3503527397,
+      "g_P20": 0.4186516853932584,
+      "g_P50": 0.5275353218210361,
+      "g_P80": 0.6384263959390863
+    },
+    {
+      "key": "zins10",
+      "label": "Zinssatz 10 %",
+      "H1": 0.9995,
+      "H2": 0.591,
+      "H2_ci": {
+        "se": 0.004916492652287808,
+        "lo": 0.5813636744015158,
+        "hi": 0.6006363255984841
+      },
+      "mean_dEV": -236901.09699676107,
+      "g_P20": 0.45519101123595507,
+      "g_P50": 0.5686084142394822,
+      "g_P80": 0.6893617021276596
+    },
+    {
+      "key": "T10",
+      "label": "Horizont 10 Jahre",
+      "H1": 0.7353,
+      "H2": 0.9716,
+      "H2_ci": {
+        "se": 0.0016611273280516452,
+        "lo": 0.9683441904370188,
+        "hi": 0.9748558095629812
+      },
+      "mean_dEV": -112093.49618326816,
+      "g_P20": 0.1998546209761163,
+      "g_P50": 0.2436113125453227,
+      "g_P80": 0.29931297709923665
+    }
+  ],
   "konvergenz": [
     {
       "n": 100,
       "anteil_MF_guenstiger_EV": 1.0,
-      "P_MS_stark": 0.6
+      "P_MS_stark": 0.62
     },
     {
       "n": 250,
-      "anteil_MF_guenstiger_EV": 1.0,
-      "P_MS_stark": 0.584
+      "anteil_MF_guenstiger_EV": 0.996,
+      "P_MS_stark": 0.644
     },
     {
       "n": 500,
-      "anteil_MF_guenstiger_EV": 1.0,
-      "P_MS_stark": 0.536
+      "anteil_MF_guenstiger_EV": 0.998,
+      "P_MS_stark": 0.63
     },
     {
       "n": 1000,
-      "anteil_MF_guenstiger_EV": 1.0,
-      "P_MS_stark": 0.568
+      "anteil_MF_guenstiger_EV": 0.999,
+      "P_MS_stark": 0.651
     },
     {
       "n": 2500,
-      "anteil_MF_guenstiger_EV": 0.9992,
-      "P_MS_stark": 0.574
+      "anteil_MF_guenstiger_EV": 0.9988,
+      "P_MS_stark": 0.6636
     },
     {
       "n": 5000,
-      "anteil_MF_guenstiger_EV": 0.9996,
-      "P_MS_stark": 0.5714
+      "anteil_MF_guenstiger_EV": 0.9994,
+      "P_MS_stark": 0.6576
     },
     {
       "n": 10000,
-      "anteil_MF_guenstiger_EV": 0.9995,
-      "P_MS_stark": 0.5671
+      "anteil_MF_guenstiger_EV": 0.9993,
+      "P_MS_stark": 0.6569
     }
   ]
 }

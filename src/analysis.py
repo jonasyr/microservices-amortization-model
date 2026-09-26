@@ -47,3 +47,18 @@ def prcc(X, y):
         ex, ey = R[:, j] - Z @ bx, ry - Z @ by
         out[j] = np.corrcoef(ex, ey)[0, 1]
     return out
+
+
+def srrc(X, y):
+    """Standardisierte Rangregressionskoeffizienten (SRRC) und R² der Rangregression.
+
+    Bei unkorrelierten Eingaben entspricht SRRC² näherungsweise dem Anteil der Varianz der
+    rangtransformierten Zielgröße, der auf den jeweiligen Parameter entfällt.
+    """
+    R = np.column_stack([rankdata(c) for c in X.T])
+    ry = rankdata(y)
+    Rz = (R - R.mean(axis=0)) / R.std(axis=0)
+    yz = (ry - ry.mean()) / ry.std()
+    beta, *_ = np.linalg.lstsq(Rz, yz, rcond=None)
+    r2 = 1.0 - np.sum((yz - Rz @ beta) ** 2) / np.sum(yz ** 2)
+    return beta, r2

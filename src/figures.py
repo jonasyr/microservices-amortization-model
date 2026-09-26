@@ -137,7 +137,15 @@ def fig_heatmap():
                        shading="nearest")
     cs = ax.contour(g, np.arange(len(h)), P, levels=[0.2, 0.5, 0.8], colors="black",
                     linewidths=[0.7, 1.3, 0.7], linestyles=[":", "-", ":"])
-    ax.clabel(cs, fmt=lambda v: de(v * 100) + "\u00a0%", fontsize=7)
+    # Beschriftungen in unterschiedlichen Zeilen platzieren, damit sie sich nicht überlappen
+    from .analysis import crossing
+    spots = []
+    for level, row in ((0.2, 7), (0.5, 4), (0.8, 1)):
+        xg = crossing(g, P[row], level)
+        if xg is not None:
+            spots.append((xg, row))
+    ax.clabel(cs, fmt=lambda v: de(v * 100) + "\u00a0%", fontsize=7, manual=spots,
+              inline_spacing=4)
     ax.set_yticks(np.arange(len(h)), [de(x) for x in h])
     ax.set_ylabel(r"Kapazitätsreserve $h = N_{\mathrm{krit}}/N_0$")
     ax.set_xlabel("jährliche Wachstumsrate der Nutzerzahl $g$")
@@ -155,7 +163,7 @@ def fig_sensitivitaet():
     torn = r["sensitivitaet"]["tornado"]
     rows = torn["zeilen"][::-1]
     base = torn["dEV_basis"]
-    prc = sorted(r["sensitivitaet"]["prcc"], key=lambda x: abs(x["prcc_dEV"]))
+    prc = sorted(r["sensitivitaet"]["prcc"], key=lambda x: x["srrc2_dEV"])
     fig, (a1, a2) = plt.subplots(1, 2, figsize=(WIDTH, 7.5 * CM),
                                  gridspec_kw={"width_ratios": [1.35, 1]})
     y = np.arange(len(rows))
@@ -172,14 +180,14 @@ def fig_sensitivitaet():
     a1.legend(loc="lower left", frameon=False, title="Parameterwert", title_fontsize=7.5)
     a1.grid(axis="y", visible=False)
     y2 = np.arange(len(prc))
-    vals = [x["prcc_dEV"] for x in prc]
-    a2.barh(y2, vals, color=[GREY["dark"] if v > 0 else GREY["light"] for v in vals],
+    vals = [x["srrc2_dEV"] for x in prc]
+    signs = [x["prcc_dEV"] for x in prc]
+    a2.barh(y2, vals, color=[GREY["dark"] if v > 0 else GREY["light"] for v in signs],
             edgecolor="black", linewidth=0.4, height=0.6)
-    a2.axvline(0, color="black", linewidth=0.8)
     a2.set_yticks(y2, [SYMBOL_TEX[x["symbol"]] for x in prc])
-    a2.set_xlim(-1, 1)
-    a2.set_xlabel(r"PRCC mit $\Delta EV$")
-    a2.xaxis.set_major_formatter(FuncFormatter(lambda v, _: de(v, 1)))
+    a2.set_xlim(0, max(vals) * 1.15)
+    a2.set_xlabel(r"Varianzanteil an $\Delta EV$ (SRRC$^2$)")
+    pct(a2, "x")
     a2.grid(axis="y", visible=False)
     fig.text(0.02, 0.98, "a", fontweight="bold", va="top")
     fig.text(0.60, 0.98, "b", fontweight="bold", va="top")

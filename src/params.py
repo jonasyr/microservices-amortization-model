@@ -1,23 +1,27 @@
 """Modellparameter: feste Größen, Szenarien und unsichere Parameter (PERT).
 
 Jeder unsichere Parameter trägt (min, Modus, max) und eine Herkunftskennung:
-  "hergeleitet"      Wert/Bereich aus einer Quelle abgeleitet
-  "relation_belegt"  Richtung/Relation literaturgestützt, Höhe gesetzt
+  "hergeleitet"      Bereich folgt aus der zitierten Stelle
+  "relation_belegt"  Richtung/Relation literaturgestützt, Höhe bzw. Breite gesetzt
   "gesetzt"          freie, offen gekennzeichnete Annahme
 
-Alle Geldbeträge in EUR pro Jahr bzw. einmalig. Die Ergebnisgrößen (Wahrscheinlichkeiten,
-Break-even-Wachstumsraten) sind invariant gegenüber einer gemeinsamen Skalierung aller
-Geldbeträge; die absolute Höhe dient nur der Anschaulichkeit.
+`cite` ist die einzige Belegangabe je Parameter (LaTeX, wird unverändert in Tab. 2
+übernommen); `note` begründet Abweichungen des Bereichs von der Quelle.
+
+Geldbeträge in EUR pro Jahr bzw. einmalig. κ, w und μ sind relativ zu I_M definiert,
+Φ, F_M, V und s absolut; die Ergebnisse gelten daher für die Größenordnung des
+Skalenankers I_M (siehe Robustheitsvariante „Skalenanker × 5").
 """
 
 from dataclasses import dataclass
 
 SEED = 20260926
 N_RUNS = 10_000
+PERT_LAMBDA = 4.0           # Formparameter der Beta-PERT-Verteilung (Standardwert)
 
 # --- feste Größen -------------------------------------------------------------
 T_YEARS = 5                 # Betrachtungszeitraum (Exposé)
-DISCOUNT_RATE = 0.05        # Kalkulationszins p. a. (Konvention, in SA variiert)
+DISCOUNT_RATE = 0.05        # Kalkulationszins p. a. (Konvention, in SA 0–10 % variiert)
 N0 = 10_000                 # Ausgangsnutzerzahl (Normierungsgröße)
 
 # Wachstumsszenarien und Eintrittswahrscheinlichkeiten (Exposé)
@@ -37,60 +41,63 @@ class Uncertain:
     high: float
     unit: str
     origin: str
-    source: str
+    cite: str
+    note: str
     group: str   # "kapazitaet_migration" | "betrieb" | "investition"
 
 
 UNCERTAIN = [
     # Investition
-    Uncertain("kappa", "Mehraufwand Erstentwicklung Microservices (Anteil von I_Mono)",
-              0.10, 0.30, 0.60, "–", "hergeleitet",
-              "taibi2017, S. 30 (0–10 % bzw. 20–30 % Mehraufwand); Obergrenze erweitert", "investition"),
+    Uncertain("kappa", "Mehraufwand Erstentwicklung Microservices (Anteil von I_M)",
+              0.00, 0.25, 0.30, "–", "hergeleitet",
+              r"\textcite[S.~30]{taibi2017}",
+              "Quelle: 24 % der Befragten 0–10 %, 76 % 20–30 % Mehraufwand", "investition"),
     # Wartung
-    Uncertain("w", "Wartungskosten p. a. im Ausgangszustand (Anteil von I_Mono)",
-              0.15, 0.20, 0.30, "–", "gesetzt",
-              "Annahme; Wartungswachstum lehman1980", "betrieb"),
-    Uncertain("omega", "Wartungsmehraufwand Microservices im Ausgangszustand",
-              0.10, 0.30, 0.60, "–", "relation_belegt",
-              "soldani2018; razzaq2023 (Betriebs-/DevOps-Overhead)", "betrieb"),
+    Uncertain("w", "Wartungskosten p. a. im Ausgangszustand (Anteil von I_M)",
+              0.15, 0.20, 0.30, "–", "gesetzt", "Annahme", "", "betrieb"),
+    Uncertain("omega", "Entwicklungs- und Wartungsmehraufwand Microservices",
+              0.05, 0.20, 0.40, "–", "relation_belegt",
+              r"\textcite[S.~27]{taibi2017}",
+              "Quelle: Mehraufwand von knapp 20 %; Breite gesetzt", "betrieb"),
     Uncertain("gamma_M", "Wartungsexponent Monolith",
-              0.40, 0.60, 0.80, "–", "relation_belegt",
-              "richards2020; comstock2011 (Kopplung, Skalenunwirtschaftlichkeit)", "betrieb"),
+              0.40, 0.60, 0.80, "–", "gesetzt", "Annahme",
+              "Richtung γ_M > γ_S aus Kopplungsargument (Kap. 2.1)", "betrieb"),
     Uncertain("gamma_S", "Wartungsexponent Microservices",
-              0.20, 0.35, 0.50, "–", "relation_belegt",
-              "richards2020 (Entkopplung)", "betrieb"),
+              0.20, 0.35, 0.50, "–", "gesetzt", "Annahme", "", "betrieb"),
     # Infrastruktur
     Uncertain("F_M", "Infrastruktur-Fixkosten Monolith p. a.",
-              6_000, 12_000, 20_000, "EUR/a", "gesetzt",
-              "Annahme", "betrieb"),
-    Uncertain("Phi", "Plattform-Grundlast Microservices p. a. (zusätzlich zu F_M)",
-              20_000, 40_000, 80_000, "EUR/a", "relation_belegt",
-              "soldani2018 (Orchestrierung, Observability); Höhe gesetzt", "betrieb"),
+              6_000, 12_000, 20_000, "EUR/a", "gesetzt", "Annahme", "", "betrieb"),
+    Uncertain("Phi", "Plattform-Grundlast Microservices p. a. (Werkzeuge, Betrieb)",
+              20_000, 40_000, 80_000, "EUR/a", "gesetzt",
+              r"Annahme; Richtung: \textcite[S.~27]{taibi2017}",
+              "keine begutachteten Zahlenwerte; Varianten Φ niedrig/hoch", "betrieb"),
     Uncertain("V", "lastabhängige Infrastrukturkosten Monolith p. a. bei N0",
-              20_000, 30_000, 45_000, "EUR/a", "gesetzt",
-              "Annahme", "betrieb"),
+              20_000, 30_000, 45_000, "EUR/a", "gesetzt", "Annahme", "", "betrieb"),
     Uncertain("psi", "relative Abweichung lastabhängiger Infrastrukturkosten Microservices",
-              -0.40, 0.00, 0.30, "–", "hergeleitet",
-              "villamizar2016 (günstiger) vs. ueda2016, blinowski2022 (teurer)", "betrieb"),
+              -0.15, 0.00, 0.50, "–", "relation_belegt",
+              r"\textcite[S.~182]{villamizar2016}; \textcite[S.~20364--20365]{blinowski2022}",
+              "−13,4 % (Villamizar) bis Durchsatznachteil Faktor 1,37 bis > 2 (Blinowski); Modus 0", "betrieb"),
     Uncertain("beta_M", "Infrastrukturexponent Monolith",
               0.90, 1.10, 1.40, "–", "relation_belegt",
-              "gunther2007 (nichtlineare Skalierung); blinowski2022 (≤ 1 möglich)", "betrieb"),
+              r"\textcite[S.~20360, 20369]{blinowski2022}",
+              "Kosten steigen jenseits bestimmter Konfigurationen stark; Scale-up teils effizient", "betrieb"),
     Uncertain("beta_S", "Infrastrukturexponent Microservices",
               0.85, 0.95, 1.05, "–", "relation_belegt",
-              "hassan2022 (horizontale Skalierung annähernd proportional)", "betrieb"),
+              r"\textcite[S.~20365]{blinowski2022}",
+              "Durchsatz steigt annähernd linear mit Instanzen", "betrieb"),
     Uncertain("s", "Kapazitätsstufe Microservices je Nutzerverdopplung",
-              5_000, 20_000, 50_000, "EUR", "gesetzt",
-              "Annahme", "betrieb"),
+              5_000, 20_000, 50_000, "EUR", "gesetzt", "Annahme", "", "betrieb"),
     # Kapazität und Migration
     Uncertain("h", "Kapazitätsreserve des Monolithen (Kapazitätsgrenze / N0)",
-              2.0, 5.0, 20.0, "–", "gesetzt",
-              "Existenz: gunther2007; Höhe gesetzt", "kapazitaet_migration"),
-    Uncertain("mu", "Migrationskosten (Vielfaches von I_Mono)",
-              0.50, 1.00, 2.00, "–", "gesetzt",
-              "Annahme; Größenordnung gouigoux2017, faustino2024", "kapazitaet_migration"),
+              2.0, 5.0, 20.0, "–", "gesetzt", "Annahme",
+              "Existenz einer Grenze: Villamizar S. 180, Blinowski S. 20360; Höhe gesetzt", "kapazitaet_migration"),
+    Uncertain("mu", "Migrationskosten (Vielfaches von I_M)",
+              0.50, 1.00, 2.00, "–", "gesetzt", "Annahme",
+              "Fallwerte (Gouigoux & Tamzalit 2017; Fritzsch et al. 2019, S. 486) nicht übertragbar", "kapazitaet_migration"),
     Uncertain("d", "Migrationsdauer",
-              1.0, 2.0, 3.0, "Jahre", "hergeleitet",
-              "fritzsch2019 (1,5 bis über 3 Jahre)", "kapazitaet_migration"),
+              1.5, 2.0, 4.0, "Jahre", "hergeleitet",
+              r"\textcite[S.~484, 487]{fritzsch2019}",
+              "1,5 bis über 3 Jahre; laufende Migrationen bis 4 Jahre erwartet", "kapazitaet_migration"),
 ]
 
 UNCERTAIN_BY_SYMBOL = {u.symbol: u for u in UNCERTAIN}
