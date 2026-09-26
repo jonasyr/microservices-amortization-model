@@ -1,0 +1,755 @@
+{
+  "meta": {
+    "seed": 20260926,
+    "n_runs": 10000,
+    "T": 5,
+    "i": 0.05,
+    "N0": 10000,
+    "I_Mono": 400000,
+    "szenarien": {
+      "niedrig": 0.05,
+      "mittel": 0.2,
+      "stark": 0.6
+    },
+    "wahrscheinlichkeiten": {
+      "niedrig": 0.3,
+      "mittel": 0.5,
+      "stark": 0.2
+    },
+    "python": "3.14.7",
+    "platform": "Linux-7.2.5-3-omarchy-x86_64-with-glibc2.44",
+    "pakete": {
+      "numpy": "2.5.3",
+      "scipy": "1.18.1",
+      "pandas": "3.0.6",
+      "matplotlib": "3.11.2"
+    },
+    "laufzeit_s": 527.5
+  },
+  "parameter": [
+    {
+      "symbol": "kappa",
+      "name": "Mehraufwand Erstentwicklung Microservices (Anteil von I_Mono)",
+      "low": 0.1,
+      "mode": 0.3,
+      "high": 0.6,
+      "unit": "–",
+      "origin": "relation_belegt",
+      "source": "richards2020; razzaq2023 (höhere Anfangsinvestition)",
+      "group": "investition"
+    },
+    {
+      "symbol": "w",
+      "name": "Wartungskosten p. a. im Ausgangszustand (Anteil von I_Mono)",
+      "low": 0.15,
+      "mode": 0.2,
+      "high": 0.3,
+      "unit": "–",
+      "origin": "gesetzt",
+      "source": "Annahme; Wartungswachstum lehman1980",
+      "group": "betrieb"
+    },
+    {
+      "symbol": "omega",
+      "name": "Wartungsmehraufwand Microservices im Ausgangszustand",
+      "low": 0.1,
+      "mode": 0.3,
+      "high": 0.6,
+      "unit": "–",
+      "origin": "relation_belegt",
+      "source": "soldani2018; razzaq2023 (Betriebs-/DevOps-Overhead)",
+      "group": "betrieb"
+    },
+    {
+      "symbol": "gamma_M",
+      "name": "Wartungsexponent Monolith",
+      "low": 0.4,
+      "mode": 0.6,
+      "high": 0.8,
+      "unit": "–",
+      "origin": "relation_belegt",
+      "source": "richards2020; comstock2011 (Kopplung, Skalenunwirtschaftlichkeit)",
+      "group": "betrieb"
+    },
+    {
+      "symbol": "gamma_S",
+      "name": "Wartungsexponent Microservices",
+      "low": 0.2,
+      "mode": 0.35,
+      "high": 0.5,
+      "unit": "–",
+      "origin": "relation_belegt",
+      "source": "richards2020 (Entkopplung)",
+      "group": "betrieb"
+    },
+    {
+      "symbol": "F_M",
+      "name": "Infrastruktur-Fixkosten Monolith p. a.",
+      "low": 6000,
+      "mode": 12000,
+      "high": 20000,
+      "unit": "EUR/a",
+      "origin": "gesetzt",
+      "source": "Annahme",
+      "group": "betrieb"
+    },
+    {
+      "symbol": "Phi",
+      "name": "Plattform-Grundlast Microservices p. a. (zusätzlich zu F_M)",
+      "low": 20000,
+      "mode": 40000,
+      "high": 80000,
+      "unit": "EUR/a",
+      "origin": "relation_belegt",
+      "source": "soldani2018 (Orchestrierung, Observability); Höhe gesetzt",
+      "group": "betrieb"
+    },
+    {
+      "symbol": "V",
+      "name": "lastabhängige Infrastrukturkosten Monolith p. a. bei N0",
+      "low": 20000,
+      "mode": 30000,
+      "high": 45000,
+      "unit": "EUR/a",
+      "origin": "gesetzt",
+      "source": "Annahme",
+      "group": "betrieb"
+    },
+    {
+      "symbol": "psi",
+      "name": "relative Abweichung lastabhängiger Infrastrukturkosten Microservices",
+      "low": -0.4,
+      "mode": 0.0,
+      "high": 0.3,
+      "unit": "–",
+      "origin": "hergeleitet",
+      "source": "villamizar2017 (günstiger) vs. ueda2016, blinowski2022 (teurer)",
+      "group": "betrieb"
+    },
+    {
+      "symbol": "beta_M",
+      "name": "Infrastrukturexponent Monolith",
+      "low": 0.9,
+      "mode": 1.1,
+      "high": 1.4,
+      "unit": "–",
+      "origin": "relation_belegt",
+      "source": "gunther2007 (nichtlineare Skalierung); blinowski2022 (≤ 1 möglich)",
+      "group": "betrieb"
+    },
+    {
+      "symbol": "beta_S",
+      "name": "Infrastrukturexponent Microservices",
+      "low": 0.85,
+      "mode": 0.95,
+      "high": 1.05,
+      "unit": "–",
+      "origin": "relation_belegt",
+      "source": "hassan2022 (horizontale Skalierung annähernd proportional)",
+      "group": "betrieb"
+    },
+    {
+      "symbol": "s",
+      "name": "Kapazitätsstufe Microservices je Nutzerverdopplung",
+      "low": 5000,
+      "mode": 20000,
+      "high": 50000,
+      "unit": "EUR",
+      "origin": "gesetzt",
+      "source": "Annahme",
+      "group": "betrieb"
+    },
+    {
+      "symbol": "h",
+      "name": "Kapazitätsreserve des Monolithen (Kapazitätsgrenze / N0)",
+      "low": 2.0,
+      "mode": 5.0,
+      "high": 20.0,
+      "unit": "–",
+      "origin": "gesetzt",
+      "source": "Existenz: gunther2007; Höhe gesetzt",
+      "group": "kapazitaet_migration"
+    },
+    {
+      "symbol": "mu",
+      "name": "Migrationskosten (Vielfaches von I_Mono)",
+      "low": 0.5,
+      "mode": 1.0,
+      "high": 2.0,
+      "unit": "–",
+      "origin": "gesetzt",
+      "source": "Annahme; Größenordnung gouigoux2017, faustino2024",
+      "group": "kapazitaet_migration"
+    },
+    {
+      "symbol": "d",
+      "name": "Migrationsdauer",
+      "low": 1.0,
+      "mode": 2.0,
+      "high": 3.0,
+      "unit": "Jahre",
+      "origin": "hergeleitet",
+      "source": "fritzsch2019 (1,5 bis über 3 Jahre)",
+      "group": "kapazitaet_migration"
+    }
+  ],
+  "basisfall": {
+    "niedrig": {
+      "MS": {
+        "investition": 520000.0,
+        "wartung": 480232.58724040346,
+        "infrastruktur": 379320.3705844034,
+        "skalierung_migration": 0.0,
+        "gesamt": 1379552.957824807
+      },
+      "MF": {
+        "investition": 400000.0,
+        "wartung": 380793.7228001727,
+        "infrastruktur": 205009.30937957467,
+        "skalierung_migration": 0.0,
+        "gesamt": 985803.0321797472
+      },
+      "migrationsstart_jahr": null
+    },
+    "mittel": {
+      "MS": {
+        "investition": 520000.0,
+        "wartung": 540365.4632530506,
+        "infrastruktur": 439370.2452464633,
+        "skalierung_migration": 16588.394276901512,
+        "gesamt": 1516324.1027764154
+      },
+      "MF": {
+        "investition": 400000.0,
+        "wartung": 468397.98335366393,
+        "infrastruktur": 279066.8955420145,
+        "skalierung_migration": 0.0,
+        "gesamt": 1147464.8788956786
+      },
+      "migrationsstart_jahr": null
+    },
+    "stark": {
+      "MS": {
+        "investition": 520000.0,
+        "wartung": 707566.938843384,
+        "infrastruktur": 713769.4164851919,
+        "skalierung_migration": 51922.83289198354,
+        "gesamt": 1993259.1882205592
+      },
+      "MF": {
+        "investition": 400000.0,
+        "wartung": 765264.5488021475,
+        "infrastruktur": 715424.327586764,
+        "skalierung_migration": 243377.52161938205,
+        "gesamt": 2124066.3980082935
+      },
+      "migrationsstart_jahr": 3.5
+    }
+  },
+  "szenarien": {
+    "niedrig": {
+      "g": 0.05,
+      "p": 0.3,
+      "K_MS": {
+        "median": 1425449.5635026013,
+        "q05": 1267581.4084287453,
+        "q95": 1602584.9957499362,
+        "mean": 1429047.94573293
+      },
+      "K_MF": {
+        "median": 1003093.5893466377,
+        "q05": 914542.4808533911,
+        "q95": 1110126.9018036819,
+        "mean": 1006836.0495163406
+      },
+      "delta": {
+        "median": -420543.2073372531,
+        "q05": -549981.8302531489,
+        "q95": -302059.34249998507,
+        "mean": -422211.89621658914
+      },
+      "P_MS_guenstiger": 0.0
+    },
+    "mittel": {
+      "g": 0.2,
+      "p": 0.5,
+      "K_MS": {
+        "median": 1567952.6995202086,
+        "q05": 1389751.66667159,
+        "q95": 1767235.0602640577,
+        "mean": 1572142.8554277308
+      },
+      "K_MF": {
+        "median": 1173164.045294283,
+        "q05": 1056862.6827574547,
+        "q95": 1316405.9413814112,
+        "mean": 1178343.9849916787
+      },
+      "delta": {
+        "median": -393276.0752909995,
+        "q05": -537827.1906467603,
+        "q95": -256464.1915702055,
+        "mean": -393798.87043605215
+      },
+      "P_MS_guenstiger": 0.0001
+    },
+    "stark": {
+      "g": 0.6,
+      "p": 0.2,
+      "K_MS": {
+        "median": 2061452.5317697413,
+        "q05": 1791487.5626129054,
+        "q95": 2373159.23259063,
+        "mean": 2068562.3077553106
+      },
+      "K_MF": {
+        "median": 2103215.802220738,
+        "q05": 1721210.5004972916,
+        "q95": 2533071.320939679,
+        "mean": 2112211.25198684
+      },
+      "delta": {
+        "median": 42698.377560322406,
+        "q05": -340210.9165756142,
+        "q95": 437028.31275804143,
+        "mean": 43648.94423152947
+      },
+      "P_MS_guenstiger": 0.5671
+    },
+    "EV": {
+      "EV_MS": {
+        "median": 1623988.0360309612,
+        "q05": 1437277.9122865037,
+        "q95": 1833439.6477913705,
+        "mean": 1628498.2729848064
+      },
+      "EV_MF": {
+        "median": 1309066.7247536872,
+        "q05": 1162892.8575530148,
+        "q95": 1479019.5372443302,
+        "mean": 1313665.0577481093
+      },
+      "delta": {
+        "median": -315143.00294574536,
+        "q05": -480052.6009273656,
+        "q95": -156741.6170834645,
+        "mean": -314833.21523669694
+      },
+      "anteil_MF_guenstiger": 0.9995
+    }
+  },
+  "hypothesen": {
+    "H1": {
+      "kriterium": "Anteil EV(MF) < EV(MS) >= 0.8",
+      "wert": 0.9995,
+      "bestaetigt": true
+    },
+    "H2": {
+      "kriterium": "P(MS günstiger | g = 60 %) > 0.5",
+      "wert": 0.5671,
+      "bestaetigt": true
+    },
+    "H3": {
+      "kriterium": "Rang(|PRCC|) von h und mu jeweils vor allen Betriebskostenparametern",
+      "wert": {
+        "schlechtester_rang_h_mu": 9,
+        "bester_rang_betrieb": 1
+      },
+      "bestaetigt": false,
+      "stark": {
+        "rang": {
+          "h": 1,
+          "beta_M": 2,
+          "gamma_M": 3,
+          "psi": 4,
+          "gamma_S": 5,
+          "omega": 6,
+          "mu": 7,
+          "Phi": 8,
+          "kappa": 9,
+          "beta_S": 10,
+          "V": 11,
+          "s": 12,
+          "d": 13,
+          "w": 14,
+          "F_M": 15
+        },
+        "bestaetigt": false
+      }
+    }
+  },
+  "breakeven": {
+    "kurve_schwellen": {
+      "g_bei_P20": 0.45894736842105266,
+      "g_bei_P50": 0.5765116279069767,
+      "g_bei_P80": 0.6993
+    },
+    "je_ziehung": {
+      "anteil_mit_breakeven_bis_gmax": 0.9874,
+      "g_max": 1.5,
+      "g_star": {
+        "median": 0.5750000000000001,
+        "q05": 0.36,
+        "q95": 0.8567500000000018,
+        "mean": 0.5880889203970023
+      },
+      "g_kapazitaet": {
+        "median": 0.45689080163454,
+        "q05": 0.23477658425695838,
+        "q95": 0.6637896133064863,
+        "mean": 0.45424069735886125
+      },
+      "spearman_gstar_gcap": 0.6824032492755497,
+      "g_star_minus_g_cap": {
+        "median": 0.1157745279533923,
+        "q05": -0.03654196361916961,
+        "q95": 0.3480626220891752,
+        "mean": 0.1337626743536002
+      }
+    }
+  },
+  "sensitivitaet": {
+    "prcc": [
+      {
+        "symbol": "Phi",
+        "prcc_dEV": -0.8616722449884745,
+        "prcc_dK_stark": -0.44966781189009286
+      },
+      {
+        "symbol": "omega",
+        "prcc_dEV": -0.8322025041433464,
+        "prcc_dK_stark": -0.5491635078962069
+      },
+      {
+        "symbol": "kappa",
+        "prcc_dEV": -0.7999413700368333,
+        "prcc_dK_stark": -0.42385146851250827
+      },
+      {
+        "symbol": "psi",
+        "prcc_dEV": -0.7617850038597302,
+        "prcc_dK_stark": -0.6226418333404182
+      },
+      {
+        "symbol": "h",
+        "prcc_dEV": -0.7396584614112995,
+        "prcc_dK_stark": -0.8870141341830716
+      },
+      {
+        "symbol": "gamma_M",
+        "prcc_dEV": 0.6793217412932905,
+        "prcc_dK_stark": 0.7172395910913453
+      },
+      {
+        "symbol": "beta_M",
+        "prcc_dEV": 0.6680635720646585,
+        "prcc_dK_stark": 0.7682567675377615
+      },
+      {
+        "symbol": "gamma_S",
+        "prcc_dEV": -0.5680317656713205,
+        "prcc_dK_stark": -0.5600254371180269
+      },
+      {
+        "symbol": "mu",
+        "prcc_dEV": 0.3151180727112498,
+        "prcc_dK_stark": 0.5054618844595978
+      },
+      {
+        "symbol": "w",
+        "prcc_dEV": -0.28464913627858585,
+        "prcc_dK_stark": 0.09397819212587011
+      },
+      {
+        "symbol": "s",
+        "prcc_dEV": -0.26742403035751855,
+        "prcc_dK_stark": -0.2525994930425312
+      },
+      {
+        "symbol": "beta_S",
+        "prcc_dEV": -0.250388081176327,
+        "prcc_dK_stark": -0.31816378702483156
+      },
+      {
+        "symbol": "V",
+        "prcc_dEV": 0.21519687481332547,
+        "prcc_dK_stark": 0.2762921767794699
+      },
+      {
+        "symbol": "d",
+        "prcc_dEV": -0.08858162214210863,
+        "prcc_dK_stark": -0.16508014296377785
+      },
+      {
+        "symbol": "F_M",
+        "prcc_dEV": 0.004320801300918735,
+        "prcc_dK_stark": 0.013256633755055237
+      }
+    ],
+    "tornado": {
+      "dEV_basis": -276393.1476763395,
+      "zeilen": [
+        {
+          "symbol": "Phi",
+          "low": 20000,
+          "high": 80000,
+          "dEV_low": -192704.30127056153,
+          "dEV_high": -443770.8404878957,
+          "spannweite": 251066.53921733418,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "omega",
+          "low": 0.1,
+          "high": 0.6,
+          "dEV_low": -190890.70220444363,
+          "dEV_high": -404646.8158841834,
+          "spannweite": 213756.11367973976,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "kappa",
+          "low": 0.1,
+          "high": 0.6,
+          "dEV_low": -196393.14767633955,
+          "dEV_high": -396393.1476763395,
+          "spannweite": 199999.99999999994,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "h",
+          "low": 2.0,
+          "high": 20.0,
+          "dEV_low": -156845.64778633474,
+          "dEV_high": -334803.7528649911,
+          "spannweite": 177958.10507865634,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "psi",
+          "low": -0.4,
+          "high": 0.3,
+          "dEV_low": -177997.75354979545,
+          "dEV_high": -350189.6932712476,
+          "spannweite": 172191.93972145216,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "beta_M",
+          "low": 0.9,
+          "high": 1.4,
+          "dEV_low": -321773.4579701424,
+          "dEV_high": -175536.57711127875,
+          "spannweite": 146236.88085886367,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "gamma_M",
+          "low": 0.4,
+          "high": 0.8,
+          "dEV_low": -337329.81357133883,
+          "dEV_high": -197372.44635811355,
+          "spannweite": 139957.36721322528,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "gamma_S",
+          "low": 0.2,
+          "high": 0.5,
+          "dEV_low": -231051.79534725627,
+          "dEV_high": -330485.5400793876,
+          "spannweite": 99433.74473213134,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "mu",
+          "low": 0.5,
+          "high": 2.0,
+          "dEV_low": -300730.89983827766,
+          "dEV_high": -227717.64335246303,
+          "spannweite": 73013.25648581464,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "beta_S",
+          "low": 0.85,
+          "high": 1.05,
+          "dEV_low": -256864.0113842937,
+          "dEV_high": -299007.41578308115,
+          "spannweite": 42143.40439878745,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "s",
+          "low": 5000,
+          "high": 50000,
+          "dEV_low": -262384.0748887038,
+          "dEV_high": -304411.29325161065,
+          "spannweite": 42027.21836290683,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "w",
+          "low": 0.15,
+          "high": 0.3,
+          "dEV_low": -262824.17835383717,
+          "dEV_high": -303531.0863213448,
+          "spannweite": 40706.90796750761,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "V",
+          "low": 20000,
+          "high": 45000,
+          "dEV_low": -288147.7082824054,
+          "dEV_high": -258761.30676724078,
+          "spannweite": 29386.401515164616,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "d",
+          "low": 1.0,
+          "high": 3.0,
+          "dEV_low": -273878.8984804642,
+          "dEV_high": -292618.31578429823,
+          "spannweite": 18739.417303834052,
+          "vorzeichenwechsel": false
+        },
+        {
+          "symbol": "F_M",
+          "low": 6000,
+          "high": 20000,
+          "dEV_low": -276393.14767633943,
+          "dEV_high": -276393.1476763394,
+          "spannweite": 5.820766091346741e-11,
+          "vorzeichenwechsel": false
+        }
+      ]
+    },
+    "horizont": [
+      {
+        "T": 3,
+        "anteil_MF_guenstiger_EV": 1.0,
+        "P_MS_niedrig": 0.0,
+        "P_MS_mittel": 0.0,
+        "P_MS_stark": 0.0153,
+        "g_bei_P50": null
+      },
+      {
+        "T": 4,
+        "anteil_MF_guenstiger_EV": 1.0,
+        "P_MS_niedrig": 0.0,
+        "P_MS_mittel": 0.0,
+        "P_MS_stark": 0.1709,
+        "g_bei_P50": 0.7867804878048781
+      },
+      {
+        "T": 5,
+        "anteil_MF_guenstiger_EV": 0.9995,
+        "P_MS_niedrig": 0.0,
+        "P_MS_mittel": 0.0001,
+        "P_MS_stark": 0.5671,
+        "g_bei_P50": 0.5764705882352941
+      },
+      {
+        "T": 6,
+        "anteil_MF_guenstiger_EV": 0.9896,
+        "P_MS_niedrig": 0.0,
+        "P_MS_mittel": 0.0039,
+        "P_MS_stark": 0.8706,
+        "g_bei_P50": 0.4571021992238034
+      },
+      {
+        "T": 7,
+        "anteil_MF_guenstiger_EV": 0.9465,
+        "P_MS_niedrig": 0.0,
+        "P_MS_mittel": 0.0149,
+        "P_MS_stark": 0.9334,
+        "g_bei_P50": 0.3811499436302142
+      },
+      {
+        "T": 8,
+        "anteil_MF_guenstiger_EV": 0.9195,
+        "P_MS_niedrig": 0.0,
+        "P_MS_mittel": 0.0324,
+        "P_MS_stark": 0.9385,
+        "g_bei_P50": 0.32923943661971833
+      },
+      {
+        "T": 9,
+        "anteil_MF_guenstiger_EV": 0.8967,
+        "P_MS_niedrig": 0.0,
+        "P_MS_mittel": 0.0639,
+        "P_MS_stark": 0.9386,
+        "g_bei_P50": 0.29199309749784297
+      },
+      {
+        "T": 10,
+        "anteil_MF_guenstiger_EV": 0.8581,
+        "P_MS_niedrig": 0.0,
+        "P_MS_mittel": 0.1284,
+        "P_MS_stark": 0.9386,
+        "g_bei_P50": 0.26343883661248935
+      }
+    ],
+    "p_stark": {
+      "p_stark_H1_kippt_unter_80": 0.5965217391304347,
+      "p_stark_MF_unter_50": 0.903913043478261,
+      "p_stark_mean_dEV_null": 0.9025916507615811
+    },
+    "zins": [
+      {
+        "i": 0.0,
+        "anteil_MF_guenstiger_EV": 0.9991,
+        "P_MS_stark": 0.6404
+      },
+      {
+        "i": 0.05,
+        "anteil_MF_guenstiger_EV": 0.9995,
+        "P_MS_stark": 0.5671
+      },
+      {
+        "i": 0.1,
+        "anteil_MF_guenstiger_EV": 0.9998,
+        "P_MS_stark": 0.489
+      }
+    ]
+  },
+  "konvergenz": [
+    {
+      "n": 100,
+      "anteil_MF_guenstiger_EV": 1.0,
+      "P_MS_stark": 0.6
+    },
+    {
+      "n": 250,
+      "anteil_MF_guenstiger_EV": 1.0,
+      "P_MS_stark": 0.584
+    },
+    {
+      "n": 500,
+      "anteil_MF_guenstiger_EV": 1.0,
+      "P_MS_stark": 0.536
+    },
+    {
+      "n": 1000,
+      "anteil_MF_guenstiger_EV": 1.0,
+      "P_MS_stark": 0.568
+    },
+    {
+      "n": 2500,
+      "anteil_MF_guenstiger_EV": 0.9992,
+      "P_MS_stark": 0.574
+    },
+    {
+      "n": 5000,
+      "anteil_MF_guenstiger_EV": 0.9996,
+      "P_MS_stark": 0.5714
+    },
+    {
+      "n": 10000,
+      "anteil_MF_guenstiger_EV": 0.9995,
+      "P_MS_stark": 0.5671
+    }
+  ]
+}
