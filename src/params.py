@@ -44,8 +44,8 @@ class Uncertain:
 UNCERTAIN = [
     # Investition
     Uncertain("kappa", "Mehraufwand Erstentwicklung Microservices (Anteil von I_Mono)",
-              0.10, 0.30, 0.60, "–", "relation_belegt",
-              "richards2020; razzaq2023 (höhere Anfangsinvestition)", "investition"),
+              0.10, 0.30, 0.60, "–", "hergeleitet",
+              "taibi2017, S. 30 (0–10 % bzw. 20–30 % Mehraufwand); Obergrenze erweitert", "investition"),
     # Wartung
     Uncertain("w", "Wartungskosten p. a. im Ausgangszustand (Anteil von I_Mono)",
               0.15, 0.20, 0.30, "–", "gesetzt",
@@ -71,7 +71,7 @@ UNCERTAIN = [
               "Annahme", "betrieb"),
     Uncertain("psi", "relative Abweichung lastabhängiger Infrastrukturkosten Microservices",
               -0.40, 0.00, 0.30, "–", "hergeleitet",
-              "villamizar2017 (günstiger) vs. ueda2016, blinowski2022 (teurer)", "betrieb"),
+              "villamizar2016 (günstiger) vs. ueda2016, blinowski2022 (teurer)", "betrieb"),
     Uncertain("beta_M", "Infrastrukturexponent Monolith",
               0.90, 1.10, 1.40, "–", "relation_belegt",
               "gunther2007 (nichtlineare Skalierung); blinowski2022 (≤ 1 möglich)", "betrieb"),
