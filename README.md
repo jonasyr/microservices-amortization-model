@@ -1,19 +1,47 @@
 # Stochastisches Kostenmodell: Microservices von Beginn vs. Monolith first
 
-Monte-Carlo-Kostenmodell zur Projektarbeit
-„Amortisation von Microservices-Architekturen unter Wachstumsunsicherheit“
-(IU Internationale Hochschule, B.Sc. Informatik, 2026).
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22983244.svg)](https://doi.org/10.5281/zenodo.22983244)
+[![Lizenz: MIT](https://img.shields.io/badge/Lizenz-MIT-blue.svg)](LICENSE)
 
-Das Modell vergleicht über einen Horizont von fünf Jahren die barwertigen Kosten zweier
-Vorgehensweisen: **Microservices von Beginn** (MS) und **Monolith first mit Migrationsoption**
-(MF), bei der der Monolith beim Erreichen seiner Kapazitätsgrenze migriert wird. Fünfzehn
-unsichere Kostenparameter werden aus Beta-PERT-Verteilungen gezogen (10 000 Parametersätze,
-fester Startwert). Die Parameterbereiche und ihre Quellen stehen in `src/params.py`.
+Begleitcode zur Projektarbeit **„Amortisation von Microservices-Architekturen unter
+Wachstumsunsicherheit: Ein stochastisches Kostenmodell im Vergleich zu einem
+Monolith-first-Vorgehen“**.
 
-*English summary:* stochastic total-cost model comparing "microservices from the start" with
-"monolith first with a migration option" under uncertain user growth (Monte Carlo, discounted,
-five-year horizon), including break-even growth rates, global sensitivity analysis (PRCC, SRRC²)
-and model variants. Fully reproducible with a fixed seed.
+| | |
+|---|---|
+| Hochschule | IU Internationale Hochschule |
+| Studiengang | Informatik (B.Sc.) |
+| Kurs | Praxisprojekt 6 (Kurscode DSPRAXP6042501) |
+| Prüfungsform | Projektarbeit |
+| Autor | Jonas Weirauch |
+| Jahr | 2026 |
+
+## Worum es geht
+
+Lohnt es sich, eine neue Plattform von Beginn an als Microservices-Architektur zu bauen, oder
+ist es günstiger, mit einem Monolithen zu starten und erst zu migrieren, wenn die Last es
+verlangt? Das Modell vergleicht über einen Horizont von fünf Jahren die barwertigen
+architekturbedingten Kosten beider Vorgehensweisen:
+
+- **Microservices von Beginn (MS):** höhere Anfangsinvestition und Betriebskosten, dafür
+  Skalierung in Kapazitätsstufen.
+- **Monolith first mit Migrationsoption (MF):** günstiger Start; erreicht die Nutzerzahl die
+  Kapazitätsgrenze des Monolithen, folgt eine Migration mit Parallelbetrieb.
+
+Fünfzehn unsichere Kostenparameter werden aus Beta-PERT-Verteilungen gezogen (10 000
+Parametersätze, fester Startwert). Ausgewertet werden Szenarien, Break-even-Wachstumsraten,
+eine Kreuztabelle aus Wachstum und Kapazitätsreserve, lokale und globale Sensitivität
+(Tornado, PRCC, SRRC²) sowie Modellvarianten. Parameterbereiche und ihre Quellen stehen in
+`src/params.py`.
+
+## English summary
+
+Stochastic total-cost model comparing *microservices from the start* with *monolith first with a
+migration option* under uncertain user growth (Monte Carlo, discounted, monthly steps,
+five-year horizon). It computes break-even growth rates, a growth × capacity-reserve map, local
+and global sensitivity (tornado, PRCC, SRRC²) and model variants. Fully reproducible with a fixed
+seed. Companion code to a project thesis (B.Sc. Computer Science, IU International University of
+Applied Sciences, course “Praxisprojekt 6”, DSPRAXP6042501).
 
 ## Struktur
 
@@ -40,8 +68,17 @@ python -m src.tables      # output/tabellen/
 pytest
 ```
 
-Getestet mit Python 3.14 und den Paketversionen in `requirements.txt`.
+Getestet mit Python 3.14 und den Paketversionen in `requirements.txt`. Alle Ergebnisse sind
+durch den festen Startwert reproduzierbar; die Abbildungen werden byte-identisch erzeugt.
 
 ## Zitieren
 
-Siehe `CITATION.cff`. Lizenz: MIT (`LICENSE`).
+Weirauch, J. (2026). *Stochastisches Kostenmodell: Microservices von Beginn vs. Monolith first
+mit Migrationsoption* [Software]. Zenodo. https://doi.org/10.5281/zenodo.22983244
+
+Die DOI oben steht für alle Versionen. Für eine bestimmte Version bitte die Versions-DOI von der
+Zenodo-Seite verwenden. Maschinenlesbare Angaben: `CITATION.cff`.
+
+## Lizenz
+
+MIT, siehe `LICENSE`.

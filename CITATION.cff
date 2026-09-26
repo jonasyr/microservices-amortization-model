@@ -1,20 +1,26 @@
 cff-version: 1.2.0
-message: "Wenn Sie diese Software verwenden, zitieren Sie sie bitte wie folgt."
+message: "Wenn Sie diese Software verwenden, zitieren Sie sie bitte wie folgt. / If you use this software, please cite it as below."
 title: "Stochastisches Kostenmodell: Microservices von Beginn vs. Monolith first mit Migrationsoption"
 abstract: >-
   Monte-Carlo-Kostenmodell (Barwert, Monatsschritte, Horizont fünf Jahre), das die
-  Alternativen "Microservices von Beginn" und "Monolith first mit Migrationsoption"
-  unter unsicherem Nutzerwachstum vergleicht. Enthält Parameterbereiche mit Quellen,
-  Szenario- und Break-even-Analyse, globale Sensitivitätsanalyse (PRCC, SRRC),
-  Modellvarianten und Tests. Begleitcode zu einer Projektarbeit (IU Internationale
-  Hochschule, B.Sc. Informatik, 2026).
+  Vorgehensweisen „Microservices von Beginn“ und „Monolith first mit Migrationsoption“
+  unter unsicherem Nutzerwachstum vergleicht. Begleitcode zur Projektarbeit „Amortisation
+  von Microservices-Architekturen unter Wachstumsunsicherheit: Ein stochastisches
+  Kostenmodell im Vergleich zu einem Monolith-first-Vorgehen“ im Kurs Praxisprojekt 6
+  (Kurscode DSPRAXP6042501, Prüfungsform Projektarbeit), B.Sc. Informatik,
+  IU Internationale Hochschule, 2026.
 type: software
 authors:
   - family-names: Weirauch
     given-names: Jonas
-version: 1.0.0
-date-released: 2026-09-26
+    affiliation: IU Internationale Hochschule
+version: 1.0.1
+date-released: 2026-09-27
 license: MIT
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.22983244
+    description: Concept-DOI (alle Versionen, löst auf die neueste auf)
 repository-code: "https://github.com/jonasyr/microservices-amortization-model"
 keywords:
   - microservices
@@ -23,3 +29,4 @@ keywords:
   - total cost of ownership
   - Monte Carlo simulation
   - sensitivity analysis
+  - PRCC
