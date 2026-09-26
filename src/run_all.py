@@ -70,9 +70,7 @@ def main():
             "seed": SEED, "n_runs": N_RUNS, "pert_lambda": PERT_LAMBDA, "T": T_YEARS,
             "i": DISCOUNT_RATE, "N0": N0,
             "I_Mono": I_MONO, "szenarien": SCENARIOS, "wahrscheinlichkeiten": SCENARIO_PROBS,
-            "python": sys.version.split()[0], "platform": platform.platform(),
             "pakete": {k: version(k) for k in ("numpy", "scipy", "pandas", "matplotlib")},
-            "laufzeit_s": None,
         },
         "parameter": [u.__dict__ for u in UNCERTAIN],
         "basisfall": ex.base_case_detail(),
@@ -86,10 +84,14 @@ def main():
         "varianten": var,
         "konvergenz": conv,
     }
-    results["meta"]["laufzeit_s"] = round(time.time() - t0, 1)
+    # Umgebung und Laufzeit getrennt protokollieren: results.json und alle übrigen
+    # Ergebnisdateien bleiben so über Rechner und Läufe hinweg byte-identisch (SHA256SUMS).
+    run_log = {"python": sys.version.split()[0], "platform": platform.platform(),
+               "laufzeit_s": round(time.time() - t0, 1)}
 
     (DATA / "results.json").write_text(json.dumps(results, indent=2, ensure_ascii=False),
                                        encoding="utf-8")
+    (DATA / "lauf.json").write_text(json.dumps(run_log, indent=2), encoding="utf-8")
     pd.DataFrame(curve).to_csv(DATA / "wachstumskurve.csv", index=False)
     pd.DataFrame(prob_rows).to_csv(DATA / "p_stark.csv", index=False)
     pd.DataFrame(hor).to_csv(DATA / "horizont.csv", index=False)
@@ -99,9 +101,10 @@ def main():
     (DATA / "heatmap.json").write_text(json.dumps(heat), encoding="utf-8")
     np.savez_compressed(DATA / "breakeven_je_ziehung.npz", g_star=g_star, g_cap=g_cap)
     pd.DataFrame({k: v for k, v in p.items()}).assign(dEV=d_ev).to_csv(
-        DATA / "ziehungen.csv.gz", index=False, compression="gzip")
+        DATA / "ziehungen.csv.gz", index=False,
+        compression={"method": "gzip", "mtime": 0})  # ohne Zeitstempel im gzip-Kopf
 
-    print(f"fertig in {results['meta']['laufzeit_s']} s -> {DATA}")
+    print(f"fertig in {run_log['laufzeit_s']} s -> {DATA}")
     if args.figures:
         from .figures import make_all
         make_all(p)

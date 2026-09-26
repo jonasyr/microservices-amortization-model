@@ -17,15 +17,12 @@
       "mittel": 0.5,
       "stark": 0.2
     },
-    "python": "3.14.7",
-    "platform": "Linux-7.2.5-3-omarchy-x86_64-with-glibc2.44",
     "pakete": {
       "numpy": "2.5.3",
       "scipy": "1.18.1",
       "pandas": "3.0.6",
       "matplotlib": "3.11.2"
-    },
-    "laufzeit_s": 256.3
+    }
   },
   "parameter": [
     {

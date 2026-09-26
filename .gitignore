@@ -4,3 +4,4 @@ __pycache__/
 .pytest_cache/
 output/tabellen/
 output/figures/*.pdf
+output/data/lauf.json
