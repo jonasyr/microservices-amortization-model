@@ -93,7 +93,7 @@ def tab_parameter():
     {de(I_MONO)}$\,EUR, $N_0 = {de(N0)}$ Nutzer.}}
   \label{{tab:parameter}}
   \footnotesize
-  \begin{{tabular}}{{@{{}}l >{{\raggedright\arraybackslash}}p{{5.6cm}} r r r c
+  \begin{{tabular}}{{@{{}}l >{{\raggedright\arraybackslash}}p{{5.4cm}} r r r c
       >{{\raggedright\arraybackslash}}p{{3.8cm}}@{{}}}}
     \toprule
     Symbol & Bedeutung & Min. & Modus & Max. & Herk. & Beleg \\
@@ -150,6 +150,10 @@ def tab_hypothesen(r):
     h = r["hypothesen"]
     h3 = h["H3"]
     st = h3["stark"]["rang"]
+    order = [z["symbol"] for z in sorted(r["sensitivitaet"]["prcc"],
+                                         key=lambda z: -abs(z["prcc_dEV"]))]
+    h3["wert"]["rang_h"] = order.index("h") + 1
+    h3["wert"]["rang_mu"] = order.index("mu") + 1
     ci2 = h["H2"]["ci"]
     rows = [
         ("H1", r"Anteil der Parametersätze mit $EV_{\mathrm{MF}} < EV_{\mathrm{MS}}$ mindestens 80\,\%",
@@ -159,16 +163,16 @@ def tab_hypothesen(r):
          f"{de(ci2['hi'], 1, True)}); abhängig von Annahmen, siehe \\cref{{tab:robustheit}}",
          h["H2"]["bestaetigt"]),
         ("H3", r"$h$ und $\mu$ nach $|\mathrm{PRCC}|$ vor allen Parametern der laufenden Kosten",
-         f"szenariogewichtet: Rang von $h$/$\\mu$ bis {h3['wert']['schlechtester_rang_h_mu']}, "
-         f"bester Betriebskostenrang {h3['wert']['bester_rang_betrieb']}; starkes Szenario: "
+         f"szenariogewichtet: $h$ Rang {h3['wert']['rang_h']}, $\\mu$ Rang "
+         f"{h3['wert']['rang_mu']}, $\\Phi$ Rang 1; starkes Szenario: "
          f"$h$ Rang {st['h']}, $\\mu$ Rang {st['mu']}", h3["bestaetigt"]),
     ]
     body = "\n".join(f"    {a} & {b} & {c} & {'gestützt' if d else 'nicht gestützt'} \\\\"
                      for a, b, c, d in rows)
     return HEADER + rf"""\begin{{table}}[htbp]
   \centering
-  \caption[Prüfung der Hypothesen]{{Prüfung der Hypothesen anhand der vor der Simulation
-    festgelegten Kriterien.}}
+  \caption[Prüfung der Hypothesen]{{Prüfung der Hypothesen anhand der festgelegten
+    Kriterien.}}
   \label{{tab:hypothesen}}
   \footnotesize
   \begin{{tabular}}{{@{{}}l >{{\raggedright\arraybackslash}}p{{5.2cm}}
@@ -306,6 +310,7 @@ def macros(r):
         "gZiehQneunfuenf": de(be["je_ziehung"]["g_star"]["q95"], 0, True),
         "gZiehAnteil": de(be["je_ziehung"]["anteil_mit_breakeven_bis_gmax"], 1, True),
         "gZiehUneindeutig": de(be["je_ziehung"]["anteil_nicht_eindeutig"], 1, True),
+        "gZiehOhne": de(1 - be["je_ziehung"]["anteil_mit_breakeven_bis_gmax"], 1, True),
         "gKapMedian": de(be["je_ziehung"]["g_kapazitaet"]["median"], 1, True),
         "rhoKap": de(be["je_ziehung"]["spearman_gstar_gcap"], 2),
         "gDiffMedian": de(be["je_ziehung"]["g_star_minus_g_cap"]["median"] * 100, 1),
