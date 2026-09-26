@@ -41,11 +41,12 @@ SHORT_NAME = {
 }
 CITE = {
     "kappa": r"\textcite[S.~30]{taibi2017}", "omega": r"\textcite{soldani2018}",
-    "gamma_M": r"\textcite{richards2020}", "gamma_S": r"\textcite{richards2020}",
-    "Phi": r"\textcite{soldani2018}", "psi": r"\textcite{villamizar2016}; \textcite{blinowski2022}",
-    "beta_M": r"\textcite{gunther2007}; \textcite{blinowski2022}",
-    "beta_S": r"\textcite{hassan2022}", "h": r"\textcite{gunther2007}",
-    "d": r"\textcite{fritzsch2019}",
+    "gamma_M": r"\textcite[S.~23]{taibi2017}", "gamma_S": r"\textcite[S.~23]{taibi2017}",
+    "Phi": r"\textcite[S.~27]{taibi2017}",
+    "psi": r"\textcite[S.~182]{villamizar2016}; \textcite[S.~20368]{blinowski2022}",
+    "beta_M": r"\textcite{gunther2007}; \textcite[S.~20360]{blinowski2022}",
+    "beta_S": r"\textcite[S.~20365]{blinowski2022}", "h": r"\textcite{gunther2007}",
+    "d": r"\textcite[S.~487]{fritzsch2019}",
 }
 
 
