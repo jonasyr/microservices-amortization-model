@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "Wenn Sie diese Software verwenden, zitieren Sie sie bitte wie folgt."
+title: "Stochastisches Kostenmodell: Microservices von Beginn vs. Monolith first mit Migrationsoption"
+abstract: >-
+  Monte-Carlo-Kostenmodell (Barwert, Monatsschritte, Horizont fünf Jahre), das die
+  Alternativen "Microservices von Beginn" und "Monolith first mit Migrationsoption"
+  unter unsicherem Nutzerwachstum vergleicht. Enthält Parameterbereiche mit Quellen,
+  Szenario- und Break-even-Analyse, globale Sensitivitätsanalyse (PRCC, SRRC),
+  Modellvarianten und Tests. Begleitcode zu einer Projektarbeit (IU Internationale
+  Hochschule, B.Sc. Informatik, 2026).
+type: software
+authors:
+  - family-names: Weirauch
+    given-names: Jonas
+version: 1.0.0
+date-released: 2026-09-26
+license: MIT
+repository-code: "https://github.com/jonasyr/microservices-amortization-model"
+keywords:
+  - microservices
+  - monolith
+  - software architecture
+  - total cost of ownership
+  - Monte Carlo simulation
+  - sensitivity analysis

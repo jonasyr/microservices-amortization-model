@@ -14,7 +14,9 @@ from .params import I_MONO, N0, N_RUNS, PERT_LAMBDA, SEED, UNCERTAIN
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "output" / "data"
-TAB = ROOT.parent / "tabellen"
+# Innerhalb der Projektarbeit landen die Tabellen im LaTeX-Projekt, eigenständig unter output/
+IN_PAPER = (ROOT.parent / "main.tex").exists()
+TAB = ROOT.parent / "tabellen" if IN_PAPER else ROOT / "output" / "tabellen"
 
 ORIGIN = {"hergeleitet": "H", "relation_belegt": "R", "gesetzt": "G"}
 SYMBOL_TEX = {
@@ -75,6 +77,7 @@ def num(x):
 
 
 def write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text, encoding="utf-8")
     print("->", path.relative_to(ROOT.parent))
 

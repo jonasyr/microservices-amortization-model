@@ -1,0 +1,9 @@
+{
+  "title": "Stochastisches Kostenmodell: Microservices von Beginn vs. Monolith first mit Migrationsoption",
+  "description": "Monte-Carlo-Kostenmodell (Barwert, Monatsschritte, Horizont fünf Jahre), das die Alternativen „Microservices von Beginn“ und „Monolith first mit Migrationsoption“ unter unsicherem Nutzerwachstum vergleicht. Begleitcode zu einer Projektarbeit (IU Internationale Hochschule, B.Sc. Informatik, 2026). Alle Ergebnisse sind mit festem Startwert reproduzierbar.",
+  "upload_type": "software",
+  "creators": [{"name": "Weirauch, Jonas"}],
+  "license": "MIT",
+  "language": "deu",
+  "keywords": ["microservices", "monolith", "software architecture", "total cost of ownership", "Monte Carlo simulation", "sensitivity analysis"]
+}

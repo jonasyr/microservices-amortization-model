@@ -34,7 +34,8 @@ from .sampling import sample  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "output" / "data"
 OUT = ROOT / "output" / "figures"
-PAPER_FIGS = ROOT.parent / "figures"
+# Innerhalb der Projektarbeit werden die PDFs zusätzlich ins LaTeX-Projekt kopiert
+PAPER_FIGS = ROOT.parent / "figures" if (ROOT.parent / "main.tex").exists() else None
 
 CM = 1 / 2.54
 WIDTH = 17 * CM
@@ -105,10 +106,12 @@ def panel(ax, letter, x=-0.1, y=1.04):
 
 def save(fig, name):
     OUT.mkdir(parents=True, exist_ok=True)
-    PAPER_FIGS.mkdir(parents=True, exist_ok=True)
     for ext in ("pdf", "png"):
-        fig.savefig(OUT / f"{name}.{ext}", dpi=300)
-    shutil.copy(OUT / f"{name}.pdf", PAPER_FIGS / f"{name}.pdf")
+        meta = {"CreationDate": None} if ext == "pdf" else {}
+        fig.savefig(OUT / f"{name}.{ext}", dpi=300, metadata=meta)  # reproduzierbare Dateien
+    if PAPER_FIGS is not None:
+        PAPER_FIGS.mkdir(parents=True, exist_ok=True)
+        shutil.copy(OUT / f"{name}.pdf", PAPER_FIGS / f"{name}.pdf")
     plt.close(fig)
 
 
@@ -411,7 +414,7 @@ def make_all(p=None):
     fig_heatmap()
     fig_sensitivitaet()
     fig_anhang()
-    print(f"Abbildungen -> {OUT} und {PAPER_FIGS}")
+    print(f"Abbildungen -> {OUT}" + (f" und {PAPER_FIGS}" if PAPER_FIGS else ""))
 
 
 if __name__ == "__main__":
