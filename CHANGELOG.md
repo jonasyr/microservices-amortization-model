@@ -13,7 +13,8 @@ Metadaten und die Art, wie Ergebnisse gespeichert werden.
   byte-identisch und per `SHA256SUMS` prüfbar.
 - README mit Kernergebnissen, Abbildungen und Anleitung zur exakten Replikation
 - Kurs- und Hochschulangaben in `CITATION.cff` und `.zenodo.json`
-- `SHA256SUMS` für die Ergebnisdaten, GitHub-Actions-Workflows für Tests und Replikation
+- `SHA256SUMS` für die Ergebnisdaten, GitHub-Actions-Workflows für Tests und Replikation,
+  `pytest.ini` (Tests laufen mit `pytest` und `python -m pytest`)
 
 ## [1.0.0] – 2026-09-26
 
