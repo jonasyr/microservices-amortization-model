@@ -1111,5 +1111,70 @@
       "anteil_MF_guenstiger_EV": 0.9993,
       "P_MS_stark": 0.6569
     }
+  ],
+  "amortisationsdauer": {
+    "0.60": {
+      "g": 0.6,
+      "anteil_bis_2_jahre": 0.0,
+      "anteil_bis_3_jahre": 0.0262,
+      "anteil_bis_5_jahre": 0.6569,
+      "anteil_bis_10_jahre": 0.9716,
+      "dauer_amortisierender": {
+        "median": 4.666666666666667,
+        "q05": 3.3333333333333335,
+        "q95": 6.166666666666667,
+        "mean": 4.673030739673392
+      }
+    },
+    "1.00": {
+      "g": 1.0,
+      "anteil_bis_2_jahre": 0.0097,
+      "anteil_bis_3_jahre": 0.2917,
+      "anteil_bis_5_jahre": 0.9793,
+      "anteil_bis_10_jahre": 0.986,
+      "dauer_amortisierender": {
+        "median": 3.3333333333333335,
+        "q05": 2.4166666666666665,
+        "q95": 4.333333333333333,
+        "mean": 3.330603448275862
+      }
+    }
+  },
+  "seed_stabilitaet": [
+    {
+      "seed": 20260926,
+      "H1": 0.9993,
+      "H2": 0.6569,
+      "g_P50": 0.546923076923077,
+      "prcc_rang1": "Phi"
+    },
+    {
+      "seed": 1,
+      "H1": 0.9988,
+      "H2": 0.6615,
+      "g_P50": 0.5463607594936709,
+      "prcc_rang1": "Phi"
+    },
+    {
+      "seed": 42,
+      "H1": 0.9983,
+      "H2": 0.6545,
+      "g_P50": 0.5461271676300579,
+      "prcc_rang1": "Phi"
+    },
+    {
+      "seed": 2026,
+      "H1": 0.9992,
+      "H2": 0.6561,
+      "g_P50": 0.5467586206896552,
+      "prcc_rang1": "Phi"
+    },
+    {
+      "seed": 12345,
+      "H1": 0.9982,
+      "H2": 0.661,
+      "g_P50": 0.545718954248366,
+      "prcc_rang1": "Phi"
+    }
   ]
 }

@@ -14,7 +14,8 @@ authors:
   - family-names: Weirauch
     given-names: Jonas
     affiliation: IU Internationale Hochschule
-version: 1.0.1
+    orcid: "https://orcid.org/0009-0009-6420-8576"
+version: 1.1.0
 date-released: 2026-09-27
 license: MIT
 identifiers:

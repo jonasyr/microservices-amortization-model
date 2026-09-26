@@ -2,19 +2,25 @@
 
 Alle nennenswerten Änderungen. Versionen folgen [Semantic Versioning](https://semver.org/lang/de/).
 
-## [1.0.1] – 2026-09-27
+## [1.1.0] – 2026-09-27
 
-Modelllogik und alle Ergebniswerte sind unverändert; geändert haben sich Dokumentation,
-Metadaten und die Art, wie Ergebnisse gespeichert werden.
+Modelllogik und alle Ergebniswerte aus 1.0.0 sind unverändert.
 
+### Neu
+- Amortisationsdauer je Parametersatz bei 60 % und 100 % Wachstum
+  (`experiments.amortization_time`), zur Plausibilisierung gegen Praxisangaben
+- Stabilität der Kernkennzahlen gegenüber dem Startwert mit fünf Startwerten
+  (`experiments.seed_stability`)
+- `SHA256SUMS` für alle Ergebnisdateien; GitHub-Actions-Workflows für Tests und Replikation;
+  `pytest.ini` (Tests laufen mit `pytest` und `python -m pytest`); `.python-version`
+
+### Geändert
 - Deterministische Ausgabe: Python-Version, Plattform und Laufzeit stehen nicht mehr in
   `results.json`, sondern in `output/data/lauf.json` (nicht versioniert); `ziehungen.csv.gz` wird
   ohne Zeitstempel geschrieben. Dadurch sind alle Ergebnisdateien über Läufe und Rechner hinweg
-  byte-identisch und per `SHA256SUMS` prüfbar.
+  byte-identisch.
 - README mit Kernergebnissen, Abbildungen und Anleitung zur exakten Replikation
-- Kurs- und Hochschulangaben in `CITATION.cff` und `.zenodo.json`
-- `SHA256SUMS` für die Ergebnisdaten, GitHub-Actions-Workflows für Tests und Replikation,
-  `pytest.ini` (Tests laufen mit `pytest` und `python -m pytest`)
+- Kurs-, Hochschul- und ORCID-Angaben in `CITATION.cff` und `.zenodo.json`
 
 ## [1.0.0] – 2026-09-26
 

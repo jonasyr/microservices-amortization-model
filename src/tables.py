@@ -281,6 +281,34 @@ def tab_sensitivitaet_anhang(r):
 """
 
 
+def tab_seeds(r):
+    """Anhang: Kernkennzahlen mit anderen Startwerten des Zufallszahlengenerators."""
+    rows = []
+    for k, x in enumerate(r["seed_stabilitaet"]):
+        label = f"{x['seed']} (Basisfall)" if k == 0 else str(x["seed"])
+        rows.append(f"    {label} & {de(x['H1'], 2, True)} & {de(x['H2'], 1, True)} & "
+                    f"{de(x['g_P50'], 1, True)} & ${SYMBOL_TEX[x['prcc_rang1']]}$ \\\\")
+    body = "\n".join(rows)
+    return HEADER + rf"""\begin{{table}}[htbp]
+  \centering
+  \caption[Stabilität gegenüber dem Startwert]{{Kernkennzahlen bei unterschiedlichen Startwerten
+    des Zufallszahlengenerators (je {de(N_RUNS)} Parametersätze). H1: Anteil der Parametersätze
+    mit geringerem szenariogewichtetem Erwartungswert für MF; H2: $P(\Delta K > 0)$ bei 60\,\%
+    Wachstum; $g^*$: Wachstumsrate mit 50\,\% Amortisationswahrscheinlichkeit.}}
+  \label{{tab:seeds}}
+  \footnotesize
+  \begin{{tabular}}{{@{{}}l r r r c@{{}}}}
+    \toprule
+    Startwert & H1 & H2 & $g^*$ & Rang 1 nach $|\mathrm{{PRCC}}|$ \\
+    \midrule
+{body}
+    \bottomrule
+  \end{{tabular}}
+  \source{{Eigene Darstellung.}}
+\end{{table}}
+"""
+
+
 def macros(r):
     s, h, be = r["szenarien"], r["hypothesen"], r["breakeven"]
     sens = r["sensitivitaet"]
@@ -386,6 +414,22 @@ def macros(r):
                            (0.6, 10.0, "SechzigZehn")):
         gi, hi = heat["g"].index(gv), heat["h"].index(hv)
         m[f"heatP{name}"] = de(heat["P"][hi][gi], 0, True)
+    # Plausibilisierung: Amortisationsdauer (Jahre) bei 60 % und 100 % Wachstum
+    for key, name in (("0.60", "Stark"), ("1.00", "Hundert")):
+        am = r["amortisationsdauer"][key]
+        m[f"amort{name}Zwei"] = share(am["anteil_bis_2_jahre"])
+        m[f"amort{name}Drei"] = share(am["anteil_bis_3_jahre"])
+        m[f"amort{name}Fuenf"] = share(am["anteil_bis_5_jahre"])
+        m[f"amort{name}Median"] = de(am["dauer_amortisierender"]["median"], 1)
+        m[f"amort{name}Qfuenf"] = de(am["dauer_amortisierender"]["q05"], 1)
+        m[f"amort{name}Qneunfuenf"] = de(am["dauer_amortisierender"]["q95"], 1)
+    # Seed-Stabilität: Spannweiten über alle Startwerte
+    sd = r["seed_stabilitaet"]
+    m["seedAnzahl"] = str(len(sd))
+    for key, name, nd in (("H1", "Heins", 2), ("H2", "Hzwei", 1), ("g_P50", "gStern", 1)):
+        vals = [x[key] for x in sd]
+        m[f"seed{name}Min"] = de(min(vals), nd, True)
+        m[f"seed{name}Max"] = de(max(vals), nd, True)
     lines = [HEADER.rstrip()]
     lines += [f"\\newcommand{{\\{k}}}{{{v}}}" for k, v in m.items()]
     return "\n".join(lines) + "\n"
@@ -402,6 +446,7 @@ def main():
           tab_robustheit(r, keys=[v["key"] for v in r["varianten"]],
                          label="tab:robustheit_anhang", appendix=True))
     write(TAB / "tab_sensitivitaet_anhang.tex", tab_sensitivitaet_anhang(r))
+    write(TAB / "tab_seeds.tex", tab_seeds(r))
     write(TAB / "zahlen.tex", macros(r))
 
 

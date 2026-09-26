@@ -48,6 +48,8 @@ def main():
     mono = ex.monotonicity(p)
     eq_rank = ex.equal_width_prcc()
     var = ex.variants()
+    amort = ex.amortization_time(p)
+    seeds = ex.seed_stability()
 
     h1_share = scen["EV"]["anteil_MF_guenstiger"]
     h2_prob = scen["stark"]["P_MS_guenstiger"]
@@ -83,6 +85,8 @@ def main():
                           "prcc_rang_gleiche_breite": eq_rank},
         "varianten": var,
         "konvergenz": conv,
+        "amortisationsdauer": amort,
+        "seed_stabilitaet": seeds,
     }
     # Umgebung und Laufzeit getrennt protokollieren: results.json und alle übrigen
     # Ergebnisdateien bleiben so über Rechner und Läufe hinweg byte-identisch (SHA256SUMS).

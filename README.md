@@ -14,7 +14,8 @@ Begleitcode zur Projektarbeit<br>
 *„Amortisation von Microservices-Architekturen unter Wachstumsunsicherheit:
 Ein stochastisches Kostenmodell im Vergleich zu einem Monolith-first-Vorgehen“*
 
-Jonas Weirauch · IU Internationale Hochschule · B.Sc. Informatik · 2026
+Jonas Weirauch [![ORCID](https://img.shields.io/badge/ORCID-0009--0009--6420--8576-184f95?logo=orcid&logoColor=white)](https://orcid.org/0009-0009-6420-8576)<br>
+IU Internationale Hochschule · B.Sc. Informatik · 2026
 
 </div>
 
@@ -62,6 +63,10 @@ Basisfall, 10 000 Parametersätze. Einordnung, Grenzen und alle Varianten stehen
 | *g\** über alle Modell- und Parametervarianten | ≈ 32–65 % p. a. |
 | *g\** bei zehn Jahren Horizont | ≈ 24 % p. a. |
 | Einflussreichste Größen (Varianzanteil) | Plattform-Grundlast, Kapazitätsreserve, Wartungsmehraufwand, Infrastrukturkosten |
+| Amortisationsdauer bei 60 % Wachstum (Median, 90-%-Intervall) | 4,7 Jahre (3,3–6,2); innerhalb von 3 Jahren in 2,6 % der Parametersätze |
+| Amortisationsdauer bei 100 % Wachstum (Median, 90-%-Intervall) | 3,3 Jahre (2,4–4,3); innerhalb von 3 Jahren in 29,2 % |
+| Praxisangaben zum Vergleich (Plausibilisierung) | 2–3 Jahre (Taibi et al., 2017, S. 30); unter 5 Jahren erwartet (Gouigoux & Tamzalit, 2017, S. 65) |
+| Stabilität gegenüber dem Startwert (5 Startwerte) | H1 99,82–99,93 %, H2 65,5–66,1 %, *g\** 54,6–54,7 % |
 
 <p align="center">
   <img src="output/figures/abb_wachstumskurve.png" width="820"
@@ -87,7 +92,7 @@ cd microservices-amortization-model
 python3.14 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-python -m src.run_all     # vollständiger Lauf, ca. 4–5 min → output/data/
+python -m src.run_all     # vollständiger Lauf, ca. 5–6 min → output/data/
 sha256sum -c SHA256SUMS   # prüft alle Ergebnisdateien gegen den veröffentlichten Stand
 python -m src.figures     # Abbildungen → output/figures/
 python -m src.tables      # LaTeX-Tabellen und Zahlenmakros der Arbeit → output/tabellen/
@@ -105,13 +110,14 @@ vollständigen Lauf und vergleicht die Prüfsummen.
 | [`src/params.py`](src/params.py) | Konstanten, Szenarien, unsichere Parameter mit Herkunft und Beleg |
 | [`src/model.py`](src/model.py) | Kostenfunktionen und Barwerte beider Alternativen |
 | [`src/sampling.py`](src/sampling.py) | Ziehung der Parametersätze (Beta-PERT, gleichverteilt) |
-| [`src/experiments.py`](src/experiments.py) | Szenarien, Break-even, Heatmap, Sensitivität, Varianten |
+| [`src/experiments.py`](src/experiments.py) | Szenarien, Break-even, Heatmap, Sensitivität, Varianten, Amortisationsdauer, Startwert-Stabilität |
 | [`src/analysis.py`](src/analysis.py) | PRCC, SRRC, Hilfsfunktionen |
 | [`src/run_all.py`](src/run_all.py) | vollständiger Lauf, schreibt `output/data/` |
 | [`src/figures.py`](src/figures.py), [`src/tables.py`](src/tables.py) | Abbildungen und LaTeX-Tabellen aus den Ergebnisdaten |
 | [`tests/`](tests/) | Grenzfall- und Regressionstests (`pytest`) |
 | [`output/data/`](output/data/) | Ergebnisdaten des veröffentlichten Laufs (CSV/JSON) |
 | [`SHA256SUMS`](SHA256SUMS) | Prüfsummen der Ergebnisdaten |
+| [`CHANGELOG.md`](CHANGELOG.md) | Änderungen je Version |
 
 ## Zitieren
 

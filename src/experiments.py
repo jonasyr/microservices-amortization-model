@@ -329,3 +329,38 @@ def convergence(p, d_ev, checkpoints=(100, 250, 500, 1000, 2500, 5000, 10000)):
     return [{"n": n, "anteil_MF_guenstiger_EV": float(np.mean(d_ev[:n] < 0)),
              "P_MS_stark": float(np.mean(d_st[:n] > 0))}
             for n in checkpoints if n <= len(d_ev)]
+
+
+def amortization_time(p, growth=(SCENARIOS["stark"], 1.0), T_max=10):
+    """Amortisationsdauer je Ziehung: erster Monat, ab dem die bis dahin angefallene
+    barwertige Kostendifferenz ΔK positiv ist (Microservices haben die Mehrinvestition
+    eingespielt). Dient der Plausibilisierung gegen Praxisangaben zur Amortisationszeit."""
+    months = np.arange(1, 12 * T_max + 1)
+    out = {}
+    for g in growth:
+        t_am = np.full(len(p["h"]), np.nan)
+        for m in months:
+            new = np.isnan(t_am) & (delta(p, g, T=m / 12.0) > 0)
+            t_am[new] = m / 12.0
+        ok = ~np.isnan(t_am)
+        out[f"{g:.2f}"] = {
+            "g": float(g),
+            **{f"anteil_bis_{y}_jahre": float(np.mean(t_am <= y)) for y in (2, 3, 5, T_max)},
+            "dauer_amortisierender": summary(t_am[ok]) if ok.any() else None,
+        }
+    return out
+
+
+def seed_stability(seeds=(SEED, 1, 42, 2026, 12345), n=N_RUNS):
+    """Kernkennzahlen mit anderen Startwerten: H1-Anteil, P(MS günstiger | stark),
+    Break-even-Wachstumsrate g* und einflussreichster Parameter nach |PRCC| mit ΔEV."""
+    rows = []
+    for s in seeds:
+        q = sample(n, np.random.default_rng(s))
+        scen, d_ev = scenarios(q)
+        _, thr = growth_curve(q)
+        r = np.abs(prcc(np.column_stack([q[k] for k in SYMBOLS]), d_ev))
+        rows.append({"seed": int(s), "H1": scen["EV"]["anteil_MF_guenstiger"],
+                     "H2": scen["stark"]["P_MS_guenstiger"], "g_P50": thr["g_bei_P50"],
+                     "prcc_rang1": SYMBOLS[int(np.argmax(r))]})
+    return rows

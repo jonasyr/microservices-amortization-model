@@ -131,3 +131,21 @@ def test_srrc_recovers_dominant_input():
     y = 3 * X[:, 0] + X[:, 1]
     beta, r2 = srrc(X, y)
     assert beta[0] ** 2 > beta[1] ** 2 > beta[2] ** 2 and r2 > 0.9
+
+
+def test_amortization_time_consistent_with_horizon_delta():
+    # Wer bis T = 5 amortisiert, hat ΔK(T = 5) > 0 oder hatte es vorher; Anteile monoton
+    from src.experiments import amortization_time
+    from src.model import delta
+    p = sample(300, np.random.default_rng(7))
+    a = amortization_time(p, growth=(0.8,), T_max=6)["0.80"]
+    assert a["anteil_bis_5_jahre"] >= np.mean(delta(p, 0.8, T=5) > 0) - 1e-12
+    assert a["anteil_bis_2_jahre"] <= a["anteil_bis_3_jahre"] <= a["anteil_bis_5_jahre"]
+
+
+def test_seed_stability_reproduces_base_seed():
+    from src.experiments import scenarios, seed_stability
+    rows = seed_stability(seeds=(11, 11), n=200)
+    assert rows[0] == rows[1]
+    scen, _ = scenarios(sample(200, np.random.default_rng(11)))
+    assert rows[0]["H2"] == scen["stark"]["P_MS_guenstiger"]

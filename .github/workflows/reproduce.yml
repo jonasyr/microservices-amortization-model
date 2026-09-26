@@ -1,6 +1,6 @@
 name: Reproduktion
 
-# Manuell startbar: rechnet den vollständigen Lauf (ca. 5 min) und prüft,
+# Manuell startbar: rechnet den vollständigen Lauf (ca. 5–6 min) und prüft,
 # dass alle Ergebnisdaten byte-identisch mit dem veröffentlichten Stand sind.
 on:
   workflow_dispatch:
