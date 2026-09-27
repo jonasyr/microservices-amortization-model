@@ -142,9 +142,9 @@ def fig_szenarien(p):
     lo = min(np.percentile(d, 5) for d in data)
     hi = max(np.percentile(d, 95) for d in data)
     ax.set_xlim(lo - 0.04 * (hi - lo), hi + 0.30 * (hi - lo))
-    ax.text(0.995, 1.02, "Microservices günstiger →", transform=ax.transAxes,
+    ax.text(0.995, 1.02, "MS günstiger →", transform=ax.transAxes,
             ha="right", va="bottom", fontsize=FS_S, color=INK2)
-    ax.text(0.0, 1.02, "← Monolith first günstiger", transform=ax.transAxes,
+    ax.text(0.0, 1.02, "← MF günstiger", transform=ax.transAxes,
             ha="left", va="bottom", fontsize=FS_S, color=INK2)
     save(fig, "abb_szenarien_delta")
 
@@ -154,7 +154,7 @@ def fig_wachstumskurve():
     c = pd.read_csv(DATA / "wachstumskurve.csv")
     thr = json.loads((DATA / "results.json").read_text(encoding="utf-8"))["breakeven"][
         "kurve_schwellen"]
-    fig, (a1, a2) = plt.subplots(2, 1, figsize=(WIDTH, 11 * CM), sharex=True,
+    fig, (a1, a2) = plt.subplots(2, 1, figsize=(WIDTH, 9.8 * CM), sharex=True,
                                  gridspec_kw={"height_ratios": [1.15, 1], "hspace": 0.28})
     g = c["g"].to_numpy()
     lo, hi, gs = thr["g_bei_P20"], thr["g_bei_P80"], thr["g_bei_P50"]
@@ -196,8 +196,7 @@ def fig_wachstumskurve():
         a2.plot(g, c[q], color=BLUE, linewidth=0.6, zorder=3)
     a2.plot(g, c["median"], color=BLUE, zorder=4, label="Median")
     a2.axhline(0, color=INK, linewidth=0.8, zorder=3)
-    a2.text(0.005, 0.02 * (c["q95"].max() - c["q05"].min()), r"$\Delta K$ > 0: Microservices"
-            " günstiger", fontsize=FS_S, color=INK2, va="bottom", ha="left")
+    a2.text(0.005, 0.02 * (c["q95"].max() - c["q05"].min()), r"$\Delta K$ > 0: MS günstiger", fontsize=FS_S, color=INK2, va="bottom", ha="left")
     a2.set_ylabel(r"Kostendifferenz $\Delta K$" "\nin Tsd. EUR (Barwert)")
     fmt_tsd(a2)
     a2.set_xlabel(G_LABEL)
@@ -215,7 +214,7 @@ def fig_heatmap():
     hm = json.loads((DATA / "heatmap.json").read_text(encoding="utf-8"))
     g, h, P = np.array(hm["g"]), np.array(hm["h"]), np.array(hm["P"])
     rows = np.arange(len(h))
-    fig, ax = plt.subplots(figsize=(WIDTH, 7 * CM))
+    fig, ax = plt.subplots(figsize=(WIDTH, 6.4 * CM))
     im = ax.pcolormesh(g, rows, P, cmap=SEQ, vmin=0, vmax=1, shading="nearest",
                        edgecolors="white", linewidth=0.4)
     cs = ax.contour(g, rows, P, levels=[0.2, 0.5, 0.8], colors=INK,
@@ -266,7 +265,7 @@ def fig_sensitivitaet():
     rows = torn["zeilen"][::-1]
     base = torn["dEV_basis"]
     prc = sorted(r["sensitivitaet"]["prcc"], key=lambda x: x["srrc2_dEV"])
-    fig, (a1, a2) = plt.subplots(1, 2, figsize=(WIDTH, 8.2 * CM),
+    fig, (a1, a2) = plt.subplots(1, 2, figsize=(WIDTH, 7.6 * CM),
                                  gridspec_kw={"width_ratios": [1.3, 1], "wspace": 0.32})
     # (a) Tornado mit Parameterwerten an den Balkenenden
     y = np.arange(len(rows))
@@ -299,7 +298,7 @@ def fig_sensitivitaet():
     # (b) Varianzanteile, Richtung durch Position (links: begünstigt MF, rechts: MS)
     y2 = np.arange(len(prc))
     signed = np.array([np.sign(x["prcc_dEV"]) * x["srrc2_dEV"] for x in prc])
-    a2.barh(y2, signed, color=[ORANGE if v > 0 else BLUE for v in signed], height=0.66,
+    a2.barh(y2, signed, color=INK2, height=0.66,
             edgecolor="white", linewidth=0.6, zorder=2)
     m = np.abs(signed).max()
     for k, v in enumerate(signed):
@@ -343,7 +342,7 @@ def fig_anhang():
     a.plot(5, b5, marker="o", markersize=6.5, color=ORANGE, markeredgecolor="white",
            markeredgewidth=1, zorder=5)
     a.annotate("Basisfall", (5, b5), textcoords="offset points", xytext=(7, 3), fontsize=FS_S)
-    a.set_xlabel(r"Betrachtungszeitraum $T$ in Jahren")
+    a.set_xlabel(r"Horizont $T$ in Jahren")
     a.set_ylabel("Break-even-Wachstumsrate\n" r"$g^{\!*}$ in %")
     a.xaxis.set_major_locator(MultipleLocator(1))
     a.set_ylim(0, None)
@@ -376,7 +375,7 @@ def fig_anhang():
            label=r"Anteil $\Delta K$ > 0, starkes Szenario")
     a.set_xscale("log")
     a.xaxis.set_major_formatter(FuncFormatter(lambda v, _: de(v)))
-    a.set_xlabel(r"Anzahl der Läufe $n$ (logarithmische Skala)")
+    a.set_xlabel(r"Anzahl der Parametersätze $n$ (logarithmische Skala)")
     a.set_ylabel("Kennzahl in %")
     a.set_ylim(0.5, 1.03)
     fmt_pct(a, "y")

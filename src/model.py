@@ -22,7 +22,9 @@ Modellentscheidungen mit Varianten (Robustheit):
                          (planmäßig über die Migrationsdauer verteilt und diskontiert)
   trigger = "reactive"   Migration startet bei Erreichen der Kapazitätsgrenze (Basisfall)
             "proactive"  Migration startet so früh, dass sie bei Erreichen der Grenze
-                         abgeschlossen ist (Auslösung bei h / (1+g)^d)
+                         abgeschlossen ist (Auslösung bei h / (1+g)^d). Wird die Grenze früher
+                         erreicht, als die Migration dauert, beginnt sie in Monat 1 und endet
+                         entsprechend erst nach Erreichen der Grenze.
 Kapazitätsstufen, die MS bis zum Abschluss der Migration bereits bezahlt hat, gelten bei MF
 als in den Migrationskosten M enthalten; nach Abschluss fallen nur neue Stufen an.
 """

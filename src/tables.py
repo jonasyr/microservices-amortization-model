@@ -7,6 +7,7 @@ Aufruf (aus model/):  python -m src.tables
 """
 
 import json
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 from .analysis import crossing
@@ -51,9 +52,11 @@ def de(x, nd=0, pct=False):
     schmalem Leerzeichen, echtes Minus."""
     if x is None:
         return "--"
-    v = x * 100 if pct else x
-    s = f"{abs(v):,.{nd}f}".replace(",", "X").replace(".", "{,}").replace("X", r"\,")
-    if v < 0 and float(f"{abs(v):.{nd}f}") != 0:
+    # kaufmännisch runden auf Basis der Dezimaldarstellung (vermeidet 0,6615 → 66,1 %)
+    v = Decimal(repr(float(x))) * (100 if pct else 1)
+    q = abs(v).quantize(Decimal(1).scaleb(-nd), rounding=ROUND_HALF_UP)
+    s = f"{q:,.{nd}f}".replace(",", "X").replace(".", "{,}").replace("X", r"\,")
+    if v < 0 and q != 0:
         s = MINUS + s
     return s + (r"\,\%" if pct else "")
 
@@ -85,8 +88,15 @@ def write(path, text):
 def tab_parameter():
     rows = []
     for u in UNCERTAIN:
-        rows.append(f"    ${SYMBOL_TEX[u.symbol]}$ & {SHORT_NAME[u.symbol]} & {num(u.low)} & "
-                    f"{num(u.mode)} & {num(u.high)} & {ORIGIN[u.origin]} & {u.cite} \\\\")
+        vals = (u.low, u.mode, u.high)
+        if max(abs(v) for v in vals) >= 1000:
+            cells = [de(v) for v in vals]
+        else:  # so wenige Nachkommastellen wie nötig, innerhalb der Zeile einheitlich
+            nd = next(k for k in (0, 1, 2) if all(abs(round(v, k) - v) < 1e-9 for v in vals))
+            cells = [de(v, nd) for v in vals]
+        cite = u.cite.replace("Annahme; Richtung:", "Annahme, Richtung:")
+        rows.append(f"    ${SYMBOL_TEX[u.symbol]}$ & {SHORT_NAME[u.symbol]} & {cells[0]} & "
+                    f"{cells[1]} & {cells[2]} & {ORIGIN[u.origin]} & {cite} \\\\")
     body = "\n".join(rows)
     return HEADER + rf"""\begin{{table}}[htbp]
   \centering
@@ -96,6 +106,7 @@ def tab_parameter():
     {de(I_MONO)}$\,EUR, $N_0 = {de(N0)}$ Nutzer.}}
   \label{{tab:parameter}}
   \footnotesize
+  \renewcommand{{\arraystretch}}{{1.08}}
   \begin{{tabular}}{{@{{}}l >{{\raggedright\arraybackslash}}p{{5.4cm}} r r r c
       >{{\raggedright\arraybackslash}}p{{3.8cm}}@{{}}}}
     \toprule
@@ -132,14 +143,15 @@ def tab_szenarien(r):
   \centering
   \caption[Barwertige Gesamtkosten je Szenario]{{Barwertige Gesamtkosten je Szenario und
     szenariogewichtet (Median über {de(N_RUNS)} Parametersätze, Tsd.\,EUR).
-    $\Delta K = K_{{\mathrm{{MF}}}} - K_{{\mathrm{{MS}}}}$. Positive Werte bedeuten einen
-    Kostenvorteil von Microservices von Beginn.}}
+    $\Delta K = K_{{\mathrm{{MF}}}} - K_{{\mathrm{{MS}}}}$ als Median der Differenz je
+    Parametersatz, Mittel: Mittelwert von $\Delta K$. Positive Werte bedeuten einen
+    Kostenvorteil von MS.}}
   \label{{tab:szenarien}}
   \footnotesize
   \begin{{tabular}}{{@{{}}l r r r r r r c r@{{}}}}
     \toprule
     Szenario & $g$ & $p_j$ & $K_{{\mathrm{{MS}}}}$ & $K_{{\mathrm{{MF}}}}$ & $\Delta K$ &
-      Mittel & 90-\%-Intervall & P(MS günstiger) \\
+      Mittel & 90-\%-Intervall & $P(\Delta K > 0)$ \\
     \midrule
 {body}
     \bottomrule
@@ -170,8 +182,8 @@ def tab_hypothesen(r):
          f"{h3['wert']['rang_mu']}, $\\Phi$ Rang 1. Starkes Szenario: "
          f"$h$ Rang {st['h']}, $\\mu$ Rang {st['mu']}", h3["bestaetigt"]),
     ]
-    body = "\n".join(f"    {a} & {b} & {c} & {'gestützt' if d else 'nicht gestützt'} \\\\"
-                     for a, b, c, d in rows)
+    body = "\n    \\addlinespace\n".join(
+        f"    {a} & {b} & {c} & {'gestützt' if d else 'nicht gestützt'} \\\\" for a, b, c, d in rows)
     return HEADER + rf"""\begin{{table}}[htbp]
   \centering
   \caption[Prüfung der Hypothesen]{{Prüfung der Hypothesen anhand der festgelegten
@@ -217,7 +229,7 @@ def _variant_row(v):
     band = (f"{de(v['g_P20'], 0, True)}--{de(v['g_P80'], 0, True)}"
             if v["g_P20"] is not None and v["g_P80"] is not None else "--")
     g50 = de(v["g_P50"], 0, True) if v["g_P50"] is not None else r"$>$\,100\,\%"
-    return (f"    {VARIANT_LABEL.get(v['key'], v['key'])} & {de(v['H1'], 1, True)} & {de(v['H2'], 1, True)} & "
+    return (f"    {VARIANT_LABEL.get(v['key'], v['key'])} & {de(v['H1'], 2, True)} & {de(v['H2'], 1, True)} & "
             f"{g50} & {band} \\\\")
 
 
@@ -229,8 +241,9 @@ def tab_robustheit(r, keys=MAIN_VARIANTS, label="tab:robustheit", appendix=False
     return HEADER + rf"""\begin{{table}}[htbp]
   \centering
   \caption[{cap}]{{{cap}. H1: Anteil der Parametersätze mit geringerem szenariogewichtetem
-    Erwartungswert für MF. H2: $P(\Delta K > 0)$ bei 60\,\% Wachstum. $g^*$: Wachstumsrate mit
-    50\,\% Amortisationswahrscheinlichkeit. Übergang: 20 bis 80\,\%.}}
+    EV für MF. H2: $P(\Delta K > 0)$ bei 60\,\% Wachstum. $g^*$: Wachstumsrate mit
+    50\,\% Amortisationswahrscheinlichkeit. Übergang: 20 bis 80\,\%. Bereiche als
+    Minimum / Modus / Maximum.}}
   \label{{{label}}}
   \footnotesize
   \begin{{tabular}}{{@{{}}>{{\raggedright\arraybackslash}}p{{9.2cm}} r r r c@{{}}}}
@@ -255,7 +268,7 @@ def tab_sensitivitaet_anhang(r):
         rows.append(f"    ${SYMBOL_TEX[s]}$ & {de(x['prcc_dEV'], 2)} & {k} "
                     f"({x['rang_boot_lo']}--{x['rang_boot_hi']}) & {de(x['srrc2_dEV'], 1, True)} & "
                     f"{de(x['prcc_dK_stark'], 2)} & {de(x['srrc2_dK_stark'], 1, True)} & {eq[s]} & "
-                    f"{de(mono[s], 0, True) if s in mono else '--'} \\\\")
+                    f"{de(mono[s], 1, True) if s in mono else '--'} \\\\")
     body = "\n".join(rows)
     r2 = r["hypothesen"]["H3"]["r2_rangregression"]
     return HEADER + rf"""\begin{{table}}[htbp]
@@ -263,15 +276,15 @@ def tab_sensitivitaet_anhang(r):
   \caption[Globale Sensitivität im Detail]{{Globale Sensitivität: PRCC und Rang (95-\%-Bootstrap-Intervall
     des Rangs), Varianzanteil SRRC$^2$ (Rangregression, $R^2$ = {de(r2['dEV'], 2)} bzw.
     {de(r2['dK_stark'], 2)}), Rang bei gleich breiten Bereichen (Modus $\pm$\,50\,\%) und Anteil
-    der Parametersätze mit monotonem Verlauf von $\Delta EV$ im Parameter.}}
+    der Parametersätze mit monotonem Verlauf von $\Delta EV$ im Parameter (--: nicht ausgewertet).}}
   \label{{tab:sensitivitaet_anhang}}
   \footnotesize
   \begin{{tabular}}{{@{{}}l r c r r r c r@{{}}}}
     \toprule
     & \multicolumn{{3}}{{c}}{{$\Delta EV$ (szenariogewichtet)}} &
-      \multicolumn{{2}}{{c}}{{$\Delta K$ (60\,\%)}} & gleiche & monoton \\
+      \multicolumn{{2}}{{c}}{{$\Delta K$ (60\,\%)}} & Rang bei & \\
     \cmidrule(lr){{2-4}}\cmidrule(lr){{5-6}}
-    Parameter & PRCC & Rang & SRRC$^2$ & PRCC & SRRC$^2$ & Breite & \\
+    Parameter & PRCC & Rang & SRRC$^2$ & PRCC & SRRC$^2$ & gleicher Breite & monoton \\
     \midrule
 {body}
     \bottomrule
@@ -336,7 +349,7 @@ def macros(r):
         "gSternRund": de(be["kurve_schwellen"]["g_bei_P50"], 0, True),
         "gPzwanzig": de(be["kurve_schwellen"]["g_bei_P20"], 0, True),
         "gPachtzig": de(be["kurve_schwellen"]["g_bei_P80"], 0, True),
-        "gZiehMedian": de(be["je_ziehung"]["g_star"]["median"], 1, True),
+        "gZiehMedian": de(be["je_ziehung"]["g_star"]["median"], 0, True),
         "gZiehQfuenf": de(be["je_ziehung"]["g_star"]["q05"], 0, True),
         "gZiehQneunfuenf": de(be["je_ziehung"]["g_star"]["q95"], 0, True),
         "gZiehAnteil": de(be["je_ziehung"]["anteil_mit_breakeven_bis_gmax"], 1, True),
@@ -414,6 +427,13 @@ def macros(r):
                            (0.6, 10.0, "SechzigZehn")):
         gi, hi = heat["g"].index(gv), heat["h"].index(hv)
         m[f"heatP{name}"] = de(heat["P"][hi][gi], 0, True)
+    # Nulldurchgang des Mittelwerts von ΔK über g (Bezug Erwartungswertprinzip ↔ 50-%-Kriterium)
+    import csv
+    with open(DATA / "wachstumskurve.csv", encoding="utf-8") as fh:
+        rows_wk = list(csv.DictReader(fh))
+    gk = [float(x["g"]) for x in rows_wk]
+    m["gMittelNull"] = de(crossing(gk, [float(x["mean"]) for x in rows_wk], 0.0), 0, True)
+    m["gMedianNull"] = de(crossing(gk, [float(x["median"]) for x in rows_wk], 0.0), 0, True)
     # Kostenzerlegung bei den wahrscheinlichsten Parameterwerten (Kap. 4.1)
     bf = r["basisfall"]
     lo, hi = bf["niedrig"], bf["stark"]
@@ -424,6 +444,7 @@ def macros(r):
     m["bfStarkStart"] = de(hi["migrationsstart_jahr"], 1)
     m["bfStarkDiff"] = eur_tsd(hi["MF"]["gesamt"] - hi["MS"]["gesamt"])
     m["bfStarkMig"] = eur_tsd(hi["MF"]["skalierung_migration"])
+    m["bfStarkMSSkal"] = eur_tsd(hi["MS"]["skalierung_migration"])
     # Plausibilisierung: Amortisationsdauer (Jahre) bei 60 % und 100 % Wachstum
     for key, name in (("0.60", "Stark"), ("1.00", "Hundert")):
         am = r["amortisationsdauer"][key]

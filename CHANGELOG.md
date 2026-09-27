@@ -4,12 +4,18 @@ Alle nennenswerten Änderungen. Versionen folgen [Semantic Versioning](https://s
 
 ## [1.1.1] (2026-09-27)
 
-Modelllogik und alle Ergebniswerte sind unverändert. Geändert haben sich nur Darstellungen.
+Modelllogik und alle Ergebniswerte sind unverändert (`SHA256SUMS` unverändert gültig). Geändert
+haben sich Darstellung und Dokumentation.
 
-- Tabellen: Zeichensetzung der Beschriftungen, Konfidenzintervall der Monte-Carlo-Schätzung
-  bei H2 ausdrücklich benannt, Verweise auf die Gesamttabelle der Varianten, Makros für die
-  Kostenzerlegung bei wahrscheinlichsten Werten und den Anteil der Amortisation binnen zehn Jahren
-- Abbildung zur Robustheit: y-Achse im Teil d bis 150 % statt 120 %
+- Tabellen: kaufmännische Rundung auf Basis der Dezimaldarstellung, Tab. 2 ohne unnötige
+  Nachkommastellen und mit mehr Zeilenabstand, erklärte Symbole und Spaltenköpfe, H1 mit zwei
+  Nachkommastellen, Konfidenzintervall der Monte-Carlo-Schätzung bei H2 ausdrücklich benannt,
+  Zeichensetzung der Beschriftungen
+- Neue Makros: Nulldurchgang von Mittelwert und Median von ΔK, Kostenzerlegung bei
+  wahrscheinlichsten Werten, Anteil der Amortisation binnen zehn Jahren
+- Abbildungen: einheitliche Begriffe (Parametersätze, Horizont, MS/MF), Varianzanteile einfarbig,
+  Robustheit Teil d bis 150 %, kompaktere Höhen bei gleicher Schriftgröße
+- Docstrings präzisiert (vorausschauender Auslöser, Amortisationsdauer)
 
 ## [1.1.0] (2026-09-27)
 

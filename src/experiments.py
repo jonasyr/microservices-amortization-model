@@ -332,7 +332,7 @@ def convergence(p, d_ev, checkpoints=(100, 250, 500, 1000, 2500, 5000, 10000)):
 
 
 def amortization_time(p, growth=(SCENARIOS["stark"], 1.0), T_max=10):
-    """Amortisationsdauer je Ziehung: erster Monat, ab dem die bis dahin angefallene
+    """Amortisationsdauer je Ziehung: erster Monat, in dem die bis dahin angefallene
     barwertige Kostendifferenz ΔK positiv ist (Microservices haben die Mehrinvestition
     eingespielt). Dient der Plausibilisierung gegen Praxisangaben zur Amortisationszeit."""
     months = np.arange(1, 12 * T_max + 1)
