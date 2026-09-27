@@ -132,7 +132,7 @@ def tab_szenarien(r):
   \centering
   \caption[Barwertige Gesamtkosten je Szenario]{{Barwertige Gesamtkosten je Szenario und
     szenariogewichtet (Median über {de(N_RUNS)} Parametersätze, Tsd.\,EUR).
-    $\Delta K = K_{{\mathrm{{MF}}}} - K_{{\mathrm{{MS}}}}$; positive Werte bedeuten einen
+    $\Delta K = K_{{\mathrm{{MF}}}} - K_{{\mathrm{{MS}}}}$. Positive Werte bedeuten einen
     Kostenvorteil von Microservices von Beginn.}}
   \label{{tab:szenarien}}
   \footnotesize
@@ -162,12 +162,12 @@ def tab_hypothesen(r):
         ("H1", r"Anteil der Parametersätze mit $EV_{\mathrm{MF}} < EV_{\mathrm{MS}}$ mindestens 80\,\%",
          f"{de(h['H1']['wert'], 2, True)}", h["H1"]["bestaetigt"]),
         ("H2", r"$P(\Delta K > 0 \mid g = 60\,\%)$ über 50\,\%",
-         f"{de(h['H2']['wert'], 1, True)} (95-\\%-Intervall {de(ci2['lo'], 1, True)} bis "
-         f"{de(ci2['hi'], 1, True)}); abhängig von Annahmen, siehe \\cref{{tab:robustheit}}",
+         f"{de(h['H2']['wert'], 1, True)} (95-\\%-Konfidenzintervall der Monte-Carlo-Schätzung {de(ci2['lo'], 1, True)} bis "
+         f"{de(ci2['hi'], 1, True)}), abhängig von Annahmen, siehe \\cref{{tab:robustheit_anhang}}",
          h["H2"]["bestaetigt"]),
         ("H3", r"$h$ und $\mu$ nach $|\mathrm{PRCC}|$ vor allen Parametern der laufenden Kosten",
          f"szenariogewichtet: $h$ Rang {h3['wert']['rang_h']}, $\\mu$ Rang "
-         f"{h3['wert']['rang_mu']}, $\\Phi$ Rang 1; starkes Szenario: "
+         f"{h3['wert']['rang_mu']}, $\\Phi$ Rang 1. Starkes Szenario: "
          f"$h$ Rang {st['h']}, $\\mu$ Rang {st['mu']}", h3["bestaetigt"]),
     ]
     body = "\n".join(f"    {a} & {b} & {c} & {'gestützt' if d else 'nicht gestützt'} \\\\"
@@ -229,8 +229,8 @@ def tab_robustheit(r, keys=MAIN_VARIANTS, label="tab:robustheit", appendix=False
     return HEADER + rf"""\begin{{table}}[htbp]
   \centering
   \caption[{cap}]{{{cap}. H1: Anteil der Parametersätze mit geringerem szenariogewichtetem
-    Erwartungswert für MF; H2: $P(\Delta K > 0)$ bei 60\,\% Wachstum; $g^*$: Wachstumsrate mit
-    50\,\% Amortisationswahrscheinlichkeit; Übergang: 20 bis 80\,\%.}}
+    Erwartungswert für MF. H2: $P(\Delta K > 0)$ bei 60\,\% Wachstum. $g^*$: Wachstumsrate mit
+    50\,\% Amortisationswahrscheinlichkeit. Übergang: 20 bis 80\,\%.}}
   \label{{{label}}}
   \footnotesize
   \begin{{tabular}}{{@{{}}>{{\raggedright\arraybackslash}}p{{9.2cm}} r r r c@{{}}}}
@@ -293,8 +293,8 @@ def tab_seeds(r):
   \centering
   \caption[Stabilität gegenüber dem Startwert]{{Kernkennzahlen bei unterschiedlichen Startwerten
     des Zufallszahlengenerators (je {de(N_RUNS)} Parametersätze). H1: Anteil der Parametersätze
-    mit geringerem szenariogewichtetem Erwartungswert für MF; H2: $P(\Delta K > 0)$ bei 60\,\%
-    Wachstum; $g^*$: Wachstumsrate mit 50\,\% Amortisationswahrscheinlichkeit.}}
+    mit geringerem szenariogewichtetem Erwartungswert für MF. H2: $P(\Delta K > 0)$ bei 60\,\%
+    Wachstum. $g^*$: Wachstumsrate mit 50\,\% Amortisationswahrscheinlichkeit.}}
   \label{{tab:seeds}}
   \footnotesize
   \begin{{tabular}}{{@{{}}l r r r c@{{}}}}
@@ -414,12 +414,23 @@ def macros(r):
                            (0.6, 10.0, "SechzigZehn")):
         gi, hi = heat["g"].index(gv), heat["h"].index(hv)
         m[f"heatP{name}"] = de(heat["P"][hi][gi], 0, True)
+    # Kostenzerlegung bei den wahrscheinlichsten Parameterwerten (Kap. 4.1)
+    bf = r["basisfall"]
+    lo, hi = bf["niedrig"], bf["stark"]
+    m["bfNiedrigDiff"] = eur_tsd(lo["MS"]["gesamt"] - lo["MF"]["gesamt"])
+    m["bfNiedrigInfra"] = eur_tsd(lo["MS"]["infrastruktur"] - lo["MF"]["infrastruktur"])
+    m["bfNiedrigInv"] = eur_tsd(lo["MS"]["investition"] - lo["MF"]["investition"])
+    m["bfNiedrigWart"] = eur_tsd(lo["MS"]["wartung"] - lo["MF"]["wartung"])
+    m["bfStarkStart"] = de(hi["migrationsstart_jahr"], 1)
+    m["bfStarkDiff"] = eur_tsd(hi["MF"]["gesamt"] - hi["MS"]["gesamt"])
+    m["bfStarkMig"] = eur_tsd(hi["MF"]["skalierung_migration"])
     # Plausibilisierung: Amortisationsdauer (Jahre) bei 60 % und 100 % Wachstum
     for key, name in (("0.60", "Stark"), ("1.00", "Hundert")):
         am = r["amortisationsdauer"][key]
         m[f"amort{name}Zwei"] = share(am["anteil_bis_2_jahre"])
         m[f"amort{name}Drei"] = share(am["anteil_bis_3_jahre"])
         m[f"amort{name}Fuenf"] = share(am["anteil_bis_5_jahre"])
+        m[f"amort{name}Zehn"] = de(am["anteil_bis_10_jahre"], 0, True)
         m[f"amort{name}Median"] = de(am["dauer_amortisierender"]["median"], 1)
         m[f"amort{name}Qfuenf"] = de(am["dauer_amortisierender"]["q05"], 1)
         m[f"amort{name}Qneunfuenf"] = de(am["dauer_amortisierender"]["q95"], 1)

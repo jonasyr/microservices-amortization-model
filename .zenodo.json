@@ -1,6 +1,6 @@
 {
   "title": "Stochastisches Kostenmodell: Microservices von Beginn vs. Monolith first mit Migrationsoption",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "upload_type": "software",
   "creators": [
     {
@@ -10,7 +10,7 @@
     }
   ],
   "description": "<p>Monte-Carlo-Kostenmodell, das über einen Horizont von fünf Jahren die barwertigen architekturbedingten Kosten zweier Vorgehensweisen vergleicht: <em>Microservices von Beginn</em> und <em>Monolith first mit Migrationsoption</em>, bei der der Monolith beim Erreichen seiner Kapazitätsgrenze migriert wird. Fünfzehn unsichere Kostenparameter werden aus Beta-PERT-Verteilungen gezogen (10 000 Parametersätze, fester Startwert). Das Paket enthält Szenario- und Break-even-Analyse, globale Sensitivitätsanalyse (PRCC, SRRC²), Modellvarianten, die Amortisationsdauer zur Plausibilisierung gegen Praxisangaben, eine Prüfung der Stabilität gegenüber dem Startwert, Tests sowie die Ergebnisdaten des veröffentlichten Laufs.</p><p>Begleitcode zur Projektarbeit „Amortisation von Microservices-Architekturen unter Wachstumsunsicherheit: Ein stochastisches Kostenmodell im Vergleich zu einem Monolith-first-Vorgehen“, Kurs Praxisprojekt 6 (Kurscode DSPRAXP6042501, Prüfungsform Projektarbeit), B.Sc. Informatik, IU Internationale Hochschule, 2026.</p><p><strong>English summary:</strong> Stochastic total-cost model comparing “microservices from the start” with “monolith first with a migration option” under uncertain user growth (Monte Carlo, discounted, five-year horizon), including break-even growth rates, global sensitivity analysis (PRCC, SRRC²) and model variants. Fully reproducible with a fixed seed. Companion code to a project thesis in the B.Sc. Computer Science programme at IU International University of Applied Sciences.</p>",
-  "notes": "Kurs: Praxisprojekt 6 (DSPRAXP6042501), Prüfungsform Projektarbeit, B.Sc. Informatik, IU Internationale Hochschule. Version 1.1.0 ergänzt gegenüber 1.0.0 die Auswertungen zur Amortisationsdauer (Plausibilisierung gegen Praxisangaben) und zur Stabilität gegenüber dem Startwert, speichert alle Ergebnisse deterministisch (byte-identisch reproduzierbar) und erweitert Dokumentation und Metadaten. Modelllogik und alle bisherigen Ergebniswerte sind unverändert.",
+  "notes": "Kurs: Praxisprojekt 6 (DSPRAXP6042501), Prüfungsform Projektarbeit, B.Sc. Informatik, IU Internationale Hochschule. Version 1.1.1 ergänzt gegenüber 1.0.0 die Auswertungen zur Amortisationsdauer (Plausibilisierung gegen Praxisangaben) und zur Stabilität gegenüber dem Startwert, speichert alle Ergebnisse deterministisch (byte-identisch reproduzierbar) und erweitert Dokumentation und Metadaten. Version 1.1.1 überarbeitet gegenüber 1.1.0 nur Tabellen- und Abbildungsdarstellungen. Modelllogik und alle bisherigen Ergebniswerte sind unverändert.",
   "license": "MIT",
   "language": "deu",
   "keywords": [

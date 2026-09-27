@@ -45,7 +45,7 @@ Das Modell vergleicht die barwertigen architekturbedingten Kosten beider Vorgehe
 
 - **Microservices von Beginn (MS):** höhere Anfangsinvestition, Wartungs- und Plattformkosten,
   dafür Skalierung in Kapazitätsstufen.
-- **Monolith first mit Migrationsoption (MF):** günstiger Start; erreicht die Nutzerzahl die
+- **Monolith first mit Migrationsoption (MF):** günstiger Start. Erreicht die Nutzerzahl die
   Kapazitätsgrenze des Monolithen, folgt eine Migration mit Parallelbetrieb.
 
 Fünfzehn unsichere Kostenparameter werden aus Beta-PERT-Verteilungen gezogen. Die
@@ -63,9 +63,9 @@ Basisfall, 10 000 Parametersätze. Einordnung, Grenzen und alle Varianten stehen
 | *g\** über alle Modell- und Parametervarianten | ≈ 32–65 % p. a. |
 | *g\** bei zehn Jahren Horizont | ≈ 24 % p. a. |
 | Einflussreichste Größen (Varianzanteil) | Plattform-Grundlast, Kapazitätsreserve, Wartungsmehraufwand, Infrastrukturkosten |
-| Amortisationsdauer bei 60 % Wachstum (Median, 90-%-Intervall) | 4,7 Jahre (3,3–6,2); innerhalb von 3 Jahren in 2,6 % der Parametersätze |
-| Amortisationsdauer bei 100 % Wachstum (Median, 90-%-Intervall) | 3,3 Jahre (2,4–4,3); innerhalb von 3 Jahren in 29,2 % |
-| Praxisangaben zum Vergleich (Plausibilisierung) | 2–3 Jahre (Taibi et al., 2017, S. 30); unter 5 Jahren erwartet (Gouigoux & Tamzalit, 2017, S. 65) |
+| Amortisationsdauer bei 60 % Wachstum (Median, 90-%-Intervall) | 4,7 Jahre (3,3–6,2), innerhalb von 3 Jahren in 2,6 % der Parametersätze |
+| Amortisationsdauer bei 100 % Wachstum (Median, 90-%-Intervall) | 3,3 Jahre (2,4–4,3), innerhalb von 3 Jahren in 29,2 % |
+| Praxisangaben zum Vergleich (Plausibilisierung) | 2–3 Jahre (Taibi et al., 2017, S. 30), unter 5 Verkaufsjahren nach dreijähriger Neuentwicklung erwartet (Gouigoux & Tamzalit, 2017, S. 62, 65) |
 | Stabilität gegenüber dem Startwert (5 Startwerte) | H1 99,82–99,93 %, H2 65,5–66,1 %, *g\** 54,6–54,7 % |
 
 <p align="center">
@@ -78,12 +78,12 @@ Basisfall, 10 000 Parametersätze. Einordnung, Grenzen und alle Varianten stehen
   <img src="output/figures/abb_heatmap.png" width="820"
        alt="Heatmap mit der Wachstumsrate auf der x-Achse und der Kapazitätsreserve des Monolithen (2- bis 20-fache Ausgangslast) auf der y-Achse. Dunklere Felder bedeuten einen höheren Anteil mit Kostenvorteil für Microservices. Die 50-Prozent-Linie verschiebt sich mit größerer Kapazitätsreserve von etwa 23 zu etwa 69 Prozent Wachstum.">
 </p>
-<p align="center"><sub><b>Abb. 2</b> Anteil der Parametersätze mit Kostenvorteil für Microservices nach Wachstumsrate und Kapazitätsreserve; Isolinien bei 20, 50 und 80 %.</sub></p>
+<p align="center"><sub><b>Abb. 2</b> Anteil der Parametersätze mit Kostenvorteil für Microservices nach Wachstumsrate und Kapazitätsreserve. Isolinien bei 20, 50 und 80 %.</sub></p>
 
 ## Exakte Replikation
 
 Alle Zufallszahlen stammen aus einem festen Startwert (`SEED` in
-[`src/params.py`](src/params.py)); alle Pakete sind in [`requirements.txt`](requirements.txt)
+[`src/params.py`](src/params.py)). Alle Pakete sind in [`requirements.txt`](requirements.txt)
 gepinnt. Ein frischer Lauf erzeugt die Ergebnisdaten **byte-identisch** zum veröffentlichten Stand.
 
 ```bash
@@ -126,7 +126,7 @@ mit Migrationsoption* [Software]. Zenodo. https://doi.org/10.5281/zenodo.2298324
 
 Die DOI steht für alle Versionen und führt immer zur neuesten. Für eine bestimmte Version die
 Versions-DOI von der [Zenodo-Seite](https://doi.org/10.5281/zenodo.22983244) verwenden.
-Maschinenlesbare Angaben: [`CITATION.cff`](CITATION.cff); GitHub zeigt dazu rechts
+Maschinenlesbare Angaben: [`CITATION.cff`](CITATION.cff). GitHub zeigt dazu rechts
 „Cite this repository“ an.
 
 ## English summary

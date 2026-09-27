@@ -387,12 +387,13 @@ def fig_anhang():
     okb = ~np.isnan(be["g_star"])
     a.scatter(be["g_cap"][okb], be["g_star"][okb], s=2.5, color=BLUE, alpha=0.18,
               linewidths=0, rasterized=True)
-    lim = [0, 1.2]
+    lim = [0, 1.5]
     a.plot(lim, lim, color=INK, linestyle=(0, (4, 2)), linewidth=0.9)
     a.text(0.93, 0.96, r"$g^{\!*}$ = $g_{\mathrm{kap}}$", fontsize=FS_S, ha="right", va="bottom",
            rotation=0, path_effects=HALO)
     a.set_xlim(0.1, 1.0)
-    a.set_ylim(0, 1.2)
+    a.set_ylim(0, 1.5)
+    a.yaxis.set_major_locator(MultipleLocator(0.25))
     a.set_xlabel(r"Wachstumsrate bis zur Kapazitätsgrenze $g_{\mathrm{kap}}$ in %")
     a.set_ylabel(r"$g^{\!*}$ je Parametersatz in %")
     fmt_pct(a, "x")
