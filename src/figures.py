@@ -154,7 +154,7 @@ def fig_wachstumskurve():
     c = pd.read_csv(DATA / "wachstumskurve.csv")
     thr = json.loads((DATA / "results.json").read_text(encoding="utf-8"))["breakeven"][
         "kurve_schwellen"]
-    fig, (a1, a2) = plt.subplots(2, 1, figsize=(WIDTH, 9.8 * CM), sharex=True,
+    fig, (a1, a2) = plt.subplots(2, 1, figsize=(WIDTH, 9.2 * CM), sharex=True,
                                  gridspec_kw={"height_ratios": [1.15, 1], "hspace": 0.28})
     g = c["g"].to_numpy()
     lo, hi, gs = thr["g_bei_P20"], thr["g_bei_P80"], thr["g_bei_P50"]
@@ -214,7 +214,7 @@ def fig_heatmap():
     hm = json.loads((DATA / "heatmap.json").read_text(encoding="utf-8"))
     g, h, P = np.array(hm["g"]), np.array(hm["h"]), np.array(hm["P"])
     rows = np.arange(len(h))
-    fig, ax = plt.subplots(figsize=(WIDTH, 6.4 * CM))
+    fig, ax = plt.subplots(figsize=(WIDTH, 6.0 * CM))
     im = ax.pcolormesh(g, rows, P, cmap=SEQ, vmin=0, vmax=1, shading="nearest",
                        edgecolors="white", linewidth=0.4)
     cs = ax.contour(g, rows, P, levels=[0.2, 0.5, 0.8], colors=INK,

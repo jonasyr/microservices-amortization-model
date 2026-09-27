@@ -106,7 +106,7 @@ def tab_parameter():
     {de(I_MONO)}$\,EUR, $N_0 = {de(N0)}$ Nutzer.}}
   \label{{tab:parameter}}
   \footnotesize
-  \renewcommand{{\arraystretch}}{{1.08}}
+  \renewcommand{{\arraystretch}}{{1.04}}
   \begin{{tabular}}{{@{{}}l >{{\raggedright\arraybackslash}}p{{5.4cm}} r r r c
       >{{\raggedright\arraybackslash}}p{{3.8cm}}@{{}}}}
     \toprule
