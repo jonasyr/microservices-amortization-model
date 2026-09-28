@@ -3,9 +3,10 @@
 1. Die veröffentlichten Ergebnisdaten in output/data/ stimmen mit SHA256SUMS überein.
 2. Ein frischer vollständiger Lauf (fester Startwert) nach output/_verify/data/ stimmt mit den
    veröffentlichten Daten überein: Struktur, Texte und ganze Zahlen exakt, Gleitkommazahlen bis
-   auf eine relative Abweichung von RTOL. Auf der Referenzplattform (Linux x86_64) sind die Dateien
-   byte-identisch; andere Plattformen weichen höchstens in der letzten Stelle ab (Gleitkomma-
-   bibliotheken).
+   auf TOL, relativ für Beträge ab 1 und absolut darunter (Rauschen um null, z. B. die
+   Spannweite eines Parameters ohne Einfluss). Auf demselben Rechner sind zwei Läufe
+   byte-identisch; andere Rechner (CPU, Betriebssystem) weichen in einzelnen Gleitkommazahlen in
+   der letzten Stelle ab.
 3. Die Tabellen und Zahlenmakros der Arbeit, erzeugt aus beiden Datensätzen, sind exakt gleich.
 
 Aufruf (aus dem Repo-Ordner):  python -m src.verify           # rechnet neu (ca. 6–8 min)
@@ -28,8 +29,9 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "output" / "data"
 WORK = ROOT / "output" / "_verify"
 SUMS = ROOT / "SHA256SUMS"
-RTOL = 1e-9    # weit über den gemessenen Plattformabweichungen (Windows: 3e-13), weit unter jeder gedruckten Stelle
-ATOL = 1e-12   # für Werte nahe null
+# Toleranz: |a - b| <= TOL * max(|a|, |b|, 1). Weit über den gemessenen Abweichungen zwischen
+# Rechnern (< 1e-12), weit unter jeder in der Arbeit gedruckten Stelle.
+TOL = 1e-9
 
 
 def checksum_files() -> dict[str, str]:
@@ -67,10 +69,10 @@ def load(path: Path):
 
 
 class Comparison:
-    """Sammelt Abweichungen und die größte relative Abweichung von Gleitkommazahlen."""
+    """Sammelt Abweichungen und die größte normierte Abweichung |a-b| / max(|a|, |b|, 1)."""
 
-    def __init__(self, rtol: float = RTOL, atol: float = ATOL):
-        self.rtol, self.atol = rtol, atol
+    def __init__(self, tol: float = TOL):
+        self.tol = tol
         self.errors: list[str] = []
         self.max_rel = 0.0
 
@@ -87,14 +89,13 @@ class Comparison:
         a, b = a[mask], b[mask]
         if a.size == 0:
             return
-        diff = np.abs(a - b)
-        scale = np.maximum(np.abs(a), np.abs(b))
-        rel = np.divide(diff, scale, out=np.zeros_like(diff), where=scale > 0)
+        # relativ ab Betrag 1, absolut darunter: Rauschen um null zählt nicht als Abweichung
+        rel = np.abs(a - b) / np.maximum(np.maximum(np.abs(a), np.abs(b)), 1.0)
         self.max_rel = max(self.max_rel, float(rel.max()))
-        bad = diff > self.atol + self.rtol * scale
+        bad = rel > self.tol
         if bad.any():
             self.errors.append(f"{where}: {int(bad.sum())} Werte außerhalb der Toleranz "
-                               f"(größte relative Abweichung {float(rel.max()):.2e})")
+                               f"(größte Abweichung {float(rel.max()):.2e})")
 
     def value(self, where: str, ref, new) -> None:
         if isinstance(ref, pd.DataFrame):
@@ -187,13 +188,16 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     print(f"1/3 veröffentlichte Daten: {len(checksum_files())} Dateien stimmen mit SHA256SUMS überein")
 
-    if WORK.exists():
-        shutil.rmtree(WORK)
     run_dir = args.lauf
     if run_dir is None:
+        if WORK.exists():
+            shutil.rmtree(WORK)
         run_dir = WORK / "data"
         print("2/3 frischer vollständiger Lauf nach output/_verify/data/ …")
         fresh_run(run_dir)
+    else:  # vorhandenen Lauf nie löschen, auch wenn er in output/_verify/ liegt
+        for old in ("tabellen_veroeffentlicht", "tabellen_lauf"):
+            shutil.rmtree(WORK / old, ignore_errors=True)
 
     cmp = Comparison()
     identical = 0
@@ -207,7 +211,7 @@ def main(argv: list[str] | None = None) -> int:
             continue
         cmp.value(Path(name).name, load(ROOT / name), load(new_path))
     print(f"2/3 Ergebnisdaten: {identical} von {len(checksum_files())} byte-identisch, "
-          f"größte relative Abweichung {cmp.max_rel:.1e} (Toleranz {RTOL:.0e})")
+          f"größte Abweichung {cmp.max_rel:.1e} (Toleranz {TOL:.0e}, relativ ab Betrag 1)")
 
     build_tables(DATA, WORK / "tabellen_veroeffentlicht")
     build_tables(run_dir, WORK / "tabellen_lauf")
