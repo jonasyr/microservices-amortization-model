@@ -93,19 +93,21 @@ def main():
     run_log = {"python": sys.version.split()[0], "platform": platform.platform(),
                "laufzeit_s": round(time.time() - t0, 1)}
 
+    # Zeilenende überall LF (sonst schreibt Windows CRLF und die Prüfsummen weichen ab)
     (DATA / "results.json").write_text(json.dumps(results, indent=2, ensure_ascii=False),
-                                       encoding="utf-8")
-    (DATA / "lauf.json").write_text(json.dumps(run_log, indent=2), encoding="utf-8")
-    pd.DataFrame(curve).to_csv(DATA / "wachstumskurve.csv", index=False)
-    pd.DataFrame(prob_rows).to_csv(DATA / "p_stark.csv", index=False)
-    pd.DataFrame(hor).to_csv(DATA / "horizont.csv", index=False)
-    pd.DataFrame(prcc_table).to_csv(DATA / "prcc.csv", index=False)
-    pd.DataFrame(torn["zeilen"]).to_csv(DATA / "tornado.csv", index=False)
-    pd.DataFrame(var).drop(columns=["H2_ci"]).to_csv(DATA / "varianten.csv", index=False)
-    (DATA / "heatmap.json").write_text(json.dumps(heat), encoding="utf-8")
+                                       encoding="utf-8", newline="\n")
+    (DATA / "lauf.json").write_text(json.dumps(run_log, indent=2), encoding="utf-8", newline="\n")
+    csv = {"index": False, "lineterminator": "\n"}
+    pd.DataFrame(curve).to_csv(DATA / "wachstumskurve.csv", **csv)
+    pd.DataFrame(prob_rows).to_csv(DATA / "p_stark.csv", **csv)
+    pd.DataFrame(hor).to_csv(DATA / "horizont.csv", **csv)
+    pd.DataFrame(prcc_table).to_csv(DATA / "prcc.csv", **csv)
+    pd.DataFrame(torn["zeilen"]).to_csv(DATA / "tornado.csv", **csv)
+    pd.DataFrame(var).drop(columns=["H2_ci"]).to_csv(DATA / "varianten.csv", **csv)
+    (DATA / "heatmap.json").write_text(json.dumps(heat), encoding="utf-8", newline="\n")
     np.savez_compressed(DATA / "breakeven_je_ziehung.npz", g_star=g_star, g_cap=g_cap)
     pd.DataFrame({k: v for k, v in p.items()}).assign(dEV=d_ev).to_csv(
-        DATA / "ziehungen.csv.gz", index=False,
+        DATA / "ziehungen.csv.gz", **csv,
         compression={"method": "gzip", "mtime": 0})  # ohne Zeitstempel im gzip-Kopf
 
     print(f"fertig in {run_log['laufzeit_s']} s -> {DATA}")

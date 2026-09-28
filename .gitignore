@@ -5,3 +5,4 @@ __pycache__/
 output/tabellen/
 output/figures/*.pdf
 output/data/lauf.json
+output/_verify/
