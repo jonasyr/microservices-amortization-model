@@ -2,6 +2,24 @@
 
 Alle nennenswerten Änderungen. Versionen folgen [Semantic Versioning](https://semver.org/lang/de/).
 
+## [1.1.2] (2026-09-28)
+
+Modelllogik, Ergebnisdaten und `SHA256SUMS` sind unverändert. Die Replikation ist jetzt auf jedem
+Betriebssystem prüfbar.
+
+- `.gitattributes`: Textdateien werden überall mit LF ausgecheckt. Unter Windows
+  (`core.autocrlf=true`) schlug `sha256sum -c SHA256SUMS` vorher für alle Dateien fehl, obwohl die
+  Daten korrekt waren.
+- `run_all` und `tables` schreiben immer LF. Unter Linux ist die Ausgabe byte-identisch zu 1.1.1.
+- Neu: `python -m src.verify` rechnet den vollständigen Lauf neu und prüft (1) die veröffentlichten
+  Daten gegen `SHA256SUMS`, (2) die frischen Daten gegen die veröffentlichten (Struktur und Texte
+  exakt, Gleitkommazahlen mit relativer Toleranz 10⁻⁹; gemessen unter Windows 3·10⁻¹³) und (3) die
+  daraus erzeugten Tabellen und Zahlenmakros der Arbeit Zeichen für Zeichen. Tests in
+  `tests/test_verify.py`.
+- README präzisiert: byte-identisch auf der Referenzplattform Linux x86_64, auf anderen Systemen
+  identische Tabellen und Zahlen der Arbeit, Rohdaten höchstens in der letzten Stelle verschieden.
+- CI: Tests und Reproduktion laufen unter Linux und Windows.
+
 ## [1.1.1] (2026-09-27)
 
 Modelllogik und alle Ergebniswerte sind unverändert (`SHA256SUMS` unverändert gültig). Geändert

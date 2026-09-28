@@ -84,24 +84,36 @@ Basisfall, 10 000 Parametersätze. Einordnung, Grenzen und alle Varianten stehen
 
 Alle Zufallszahlen stammen aus einem festen Startwert (`SEED` in
 [`src/params.py`](src/params.py)). Alle Pakete sind in [`requirements.txt`](requirements.txt)
-gepinnt. Ein frischer Lauf erzeugt die Ergebnisdaten **byte-identisch** zum veröffentlichten Stand.
+gepinnt. Was die Replikation zusichert:
+
+| | Linux x86_64 (Referenz) | Windows, macOS, andere |
+|---|---|---|
+| Tabellen und Zahlen der Arbeit | identisch | **identisch** |
+| Ergebnisdaten in `output/data/` | **byte-identisch** (`SHA256SUMS`) | gleiche Werte, einzelne Gleitkommazahlen weichen in der letzten Stelle ab (relativ < 10⁻¹², Rechenbibliotheken) |
+
+Die Prüfung `python -m src.verify` rechnet den vollständigen Lauf neu und bestätigt beides auf jedem
+Betriebssystem: veröffentlichte Daten gegen `SHA256SUMS`, frische Daten gegen die veröffentlichten
+(relative Toleranz 10⁻⁹) und die daraus erzeugten Tabellen und Zahlenmakros der Arbeit Zeichen für
+Zeichen.
 
 ```bash
 git clone https://github.com/jonasyr/microservices-amortization-model.git
 cd microservices-amortization-model
-python3.14 -m venv .venv && source .venv/bin/activate
+python3.14 -m venv .venv && source .venv/bin/activate   # Windows: py -3.14 -m venv .venv; .venv\Scripts\activate
 pip install -r requirements.txt
 
-python -m src.run_all     # vollständiger Lauf, ca. 5–6 min → output/data/
-sha256sum -c SHA256SUMS   # prüft alle Ergebnisdateien gegen den veröffentlichten Stand
+python -m src.verify      # vollständiger Lauf (ca. 6–8 min) und Vergleich, Ergebnis „OK: Replikation bestätigt.“
+pytest                    # Grenzfall- und Regressionstests
+
+python -m src.run_all     # nur rechnen → output/data/ (überschreibt die veröffentlichten Daten)
+sha256sum -c SHA256SUMS   # byte-genauer Vergleich, gilt auf der Referenzplattform
 python -m src.figures     # Abbildungen → output/figures/
 python -m src.tables      # LaTeX-Tabellen und Zahlenmakros der Arbeit → output/tabellen/
-pytest                    # Grenzfall- und Regressionstests
 ```
 
-Referenzumgebung: Linux x86_64, Python 3.14.7. Die Replikation lässt sich auch ohne eigene
-Installation prüfen: Unter *Actions → Reproduktion → Run workflow* rechnet GitHub den
-vollständigen Lauf und vergleicht die Prüfsummen.
+Referenzumgebung: Linux x86_64, Python 3.14.7. Ohne eigene Installation: Unter
+*Actions → Reproduktion → Run workflow* rechnet GitHub den vollständigen Lauf unter Linux (mit
+Prüfsummenvergleich) und unter Windows (mit `src.verify`).
 
 ## Struktur
 
@@ -114,6 +126,7 @@ vollständigen Lauf und vergleicht die Prüfsummen.
 | [`src/analysis.py`](src/analysis.py) | PRCC, SRRC, Hilfsfunktionen |
 | [`src/run_all.py`](src/run_all.py) | vollständiger Lauf, schreibt `output/data/` |
 | [`src/figures.py`](src/figures.py), [`src/tables.py`](src/tables.py) | Abbildungen und LaTeX-Tabellen aus den Ergebnisdaten |
+| [`src/verify.py`](src/verify.py) | Replikationsprüfung für jedes Betriebssystem |
 | [`tests/`](tests/) | Grenzfall- und Regressionstests (`pytest`) |
 | [`output/data/`](output/data/) | Ergebnisdaten des veröffentlichten Laufs (CSV/JSON) |
 | [`SHA256SUMS`](SHA256SUMS) | Prüfsummen der Ergebnisdaten |
@@ -134,8 +147,11 @@ Maschinenlesbare Angaben: [`CITATION.cff`](CITATION.cff). GitHub zeigt dazu rech
 Stochastic total-cost model comparing *microservices from the start* with *monolith first with a
 migration option* under uncertain user growth (Monte Carlo with 10,000 parameter sets, discounted,
 monthly steps, five-year horizon). It computes break-even growth rates, a growth × capacity-reserve
-map, local and global sensitivity (tornado, PRCC, SRRC²) and model variants. A fresh run
-reproduces all result files byte for byte (`sha256sum -c SHA256SUMS`). Companion code to a project
+map, local and global sensitivity (tornado, PRCC, SRRC²) and model variants. On the reference
+platform (Linux x86_64) a fresh run reproduces all result files byte for byte
+(`sha256sum -c SHA256SUMS`). On any operating system, `python -m src.verify` reruns the model and
+confirms that all tables and numbers quoted in the thesis are identical and that the raw results
+match the published ones (floating-point values may differ in the last digit). Companion code to a project
 thesis in the B.Sc. Computer Science programme at IU International University of Applied Sciences
 (course “Praxisprojekt 6”, DSPRAXP6042501).
 
