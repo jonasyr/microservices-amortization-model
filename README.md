@@ -102,7 +102,7 @@ Gemessen mit Version 1.1.2:
 | Rechner | byte-identische Dateien | größte Abweichung | Tabellen und Zahlen |
 |---|---|---|---|
 | Windows 11, Python 3.14.3 | 4 von 10 | 4 · 10⁻¹⁵ | 8 von 8 identisch |
-| GitHub Actions, Ubuntu, Python 3.14 | 3 von 10 | 9 · 10⁻¹¹ (Rundungsrest eines Werts, der mathematisch 0 ist) | 8 von 8 identisch |
+| GitHub Actions, Ubuntu, Python 3.14 | 3 bis 10 von 10 (je nach zugeteilter CPU) | 0 bis 9 · 10⁻¹¹ (Rundungsrest eines Werts, der mathematisch 0 ist) | 8 von 8 identisch |
 | GitHub Actions, Windows, Python 3.14 | 4 von 10 | 4 · 10⁻¹⁵ | 8 von 8 identisch |
 
 ```bash
