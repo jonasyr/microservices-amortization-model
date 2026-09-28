@@ -20,7 +20,7 @@ Betriebssystem prüfbar.
 - README präzisiert: Zwei Läufe auf demselben Rechner sind byte-identisch. Auf anderen Rechnern
   (auch anderen Linux-Rechnern) weichen einzelne Gleitkommazahlen in der letzten Stelle ab; die
   Tabellen und Zahlen der Arbeit sind überall identisch. Gemessen: Windows 11 (4 · 10⁻¹⁵),
-  GitHub Ubuntu (9 · 10⁻¹¹, Rundungsrest eines mathematisch verschwindenden Werts), GitHub Windows
+  GitHub Ubuntu (je nach zugeteilter CPU 10 von 10 byte-identisch oder bis 9 · 10⁻¹¹, Rundungsrest eines mathematisch verschwindenden Werts), GitHub Windows
   (4 · 10⁻¹⁵), jeweils 8 von 8 Tabellen identisch.
 - CI: Tests und Reproduktion (`src.verify`) laufen unter Linux und Windows.
 
