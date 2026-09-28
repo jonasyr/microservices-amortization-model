@@ -1,8 +1,8 @@
 name: Reproduktion
 
-# Manuell startbar: rechnet den vollständigen Lauf (ca. 6–8 min je System).
-# Linux (Referenz): src.verify und zusätzlich byte-identisch gegen SHA256SUMS.
-# Windows: src.verify (Tabellen und Zahlen identisch, Rohdaten innerhalb der Toleranz).
+# Manuell startbar: rechnet den vollständigen Lauf (ca. 6–8 min je System) unter Linux und
+# Windows und prüft mit src.verify: veröffentlichte Daten gegen SHA256SUMS, frische Daten gegen
+# die veröffentlichten (Toleranz 1e-9) und die Tabellen und Zahlen der Arbeit Zeichen für Zeichen.
 on:
   workflow_dispatch:
 
@@ -21,6 +21,3 @@ jobs:
           cache: pip
       - run: pip install -r requirements.txt
       - run: python -m src.verify
-      - name: Byte-identisch zum veröffentlichten Stand (Referenzplattform)
-        if: runner.os == 'Linux'
-        run: sed 's#output/data/#data/#' SHA256SUMS | (cd output/_verify && sha256sum -c -)

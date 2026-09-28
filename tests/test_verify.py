@@ -3,7 +3,7 @@
 import numpy as np
 import pandas as pd
 
-from src.verify import RTOL, Comparison, check_published
+from src.verify import TOL, Comparison, check_published
 
 
 def compare(ref, new):
@@ -25,7 +25,7 @@ def test_last_digit_differences_are_accepted():
 
 
 def test_deviation_above_tolerance_is_reported():
-    c = compare({"a": 1.0}, {"a": 1.0 + 10 * RTOL})
+    c = compare({"a": 1.0}, {"a": 1.0 + 10 * TOL})
     assert len(c.errors) == 1
 
 
@@ -53,3 +53,13 @@ def test_arrays_and_missing_values():
     assert compare(a, a.copy()).errors == []
     assert compare(a, np.array([1.0, 2.0, 3.0])).errors
     assert compare(np.array([1, 2]), np.array([1, 3])).errors
+
+
+def test_rounding_noise_around_zero_is_accepted():
+    # Tornado-Spannweite eines Parameters ohne Einfluss: mathematisch 0, gespeichert als Rundungsrest
+    assert compare({"spannweite": 5.820766091346741e-11}, {"spannweite": 2.9103830456733704e-11}).errors == []
+
+
+def test_real_deviation_in_small_values_is_reported():
+    # Anteile und Wahrscheinlichkeiten liegen unter 1: 1e-6 ist dort eine echte Abweichung
+    assert compare({"anteil": 0.4213}, {"anteil": 0.4213 + 1e-6}).errors
