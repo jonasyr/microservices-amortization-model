@@ -1,0 +1,7 @@
+# Zeilenenden auf allen Plattformen gleich: Textdateien immer mit LF auschecken,
+# damit SHA256SUMS auch unter Windows (core.autocrlf=true) sofort stimmt.
+* text=auto eol=lf
+*.npz binary
+*.gz binary
+*.png binary
+*.pdf binary
