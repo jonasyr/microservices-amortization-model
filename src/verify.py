@@ -29,9 +29,9 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "output" / "data"
 WORK = ROOT / "output" / "_verify"
 SUMS = ROOT / "SHA256SUMS"
-# Toleranz: |a - b| <= TOL * max(|a|, |b|, 1). Weit über den gemessenen Abweichungen zwischen
-# Rechnern (< 1e-12), weit unter jeder in der Arbeit gedruckten Stelle.
-TOL = 1e-9
+# Toleranz: |a - b| <= TOL * max(|a|, |b|, 1). Gemessen zwischen Rechnern höchstens 8.7e-11
+# (Rauschen um null), also über 100-fache Reserve; weit unter jeder in der Arbeit gedruckten Stelle.
+TOL = 1e-8
 
 
 def checksum_files() -> dict[str, str]:

@@ -10,15 +10,19 @@ Betriebssystem prüfbar.
 - `.gitattributes`: Textdateien werden überall mit LF ausgecheckt. Unter Windows
   (`core.autocrlf=true`) schlug `sha256sum -c SHA256SUMS` vorher für alle Dateien fehl, obwohl die
   Daten korrekt waren.
-- `run_all` und `tables` schreiben immer LF. Unter Linux ist die Ausgabe byte-identisch zu 1.1.1.
+- `run_all` und `tables` schreiben immer LF (unter Linux war das bereits der Fall, die Ausgabe dort
+  ist unverändert).
 - Neu: `python -m src.verify` rechnet den vollständigen Lauf neu und prüft (1) die veröffentlichten
   Daten gegen `SHA256SUMS`, (2) die frischen Daten gegen die veröffentlichten (Struktur und Texte
-  exakt, Gleitkommazahlen mit relativer Toleranz 10⁻⁹; gemessen unter Windows 3·10⁻¹³) und (3) die
+  exakt, Gleitkommazahlen mit Toleranz 10⁻⁸, relativ ab Betrag 1, absolut darunter) und (3) die
   daraus erzeugten Tabellen und Zahlenmakros der Arbeit Zeichen für Zeichen. Tests in
   `tests/test_verify.py`.
-- README präzisiert: byte-identisch auf der Referenzplattform Linux x86_64, auf anderen Systemen
-  identische Tabellen und Zahlen der Arbeit, Rohdaten höchstens in der letzten Stelle verschieden.
-- CI: Tests und Reproduktion laufen unter Linux und Windows.
+- README präzisiert: Zwei Läufe auf demselben Rechner sind byte-identisch. Auf anderen Rechnern
+  (auch anderen Linux-Rechnern) weichen einzelne Gleitkommazahlen in der letzten Stelle ab; die
+  Tabellen und Zahlen der Arbeit sind überall identisch. Gemessen: Windows 11 (4 · 10⁻¹⁵),
+  GitHub Ubuntu (9 · 10⁻¹¹, Rundungsrest eines mathematisch verschwindenden Werts), GitHub Windows
+  (4 · 10⁻¹⁵), jeweils 8 von 8 Tabellen identisch.
+- CI: Tests und Reproduktion (`src.verify`) laufen unter Linux und Windows.
 
 ## [1.1.1] (2026-09-27)
 

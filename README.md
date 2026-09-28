@@ -86,15 +86,24 @@ Alle Zufallszahlen stammen aus einem festen Startwert (`SEED` in
 [`src/params.py`](src/params.py)). Alle Pakete sind in [`requirements.txt`](requirements.txt)
 gepinnt. Was die Replikation zusichert:
 
-| | Linux x86_64 (Referenz) | Windows, macOS, andere |
+| | auf demselben Rechner | auf jedem anderen Rechner (Linux, Windows, macOS) |
 |---|---|---|
 | Tabellen und Zahlen der Arbeit | identisch | **identisch** |
-| Ergebnisdaten in `output/data/` | **byte-identisch** (`SHA256SUMS`) | gleiche Werte, einzelne Gleitkommazahlen weichen in der letzten Stelle ab (relativ < 10⁻¹², Rechenbibliotheken) |
+| Ergebnisdaten eines frischen Laufs | zwei Läufe **byte-identisch** | gleiche Werte, einzelne Gleitkommazahlen weichen in der letzten Stelle ab (CPU und Rechenbibliotheken) |
+| Veröffentlichte Daten in `output/data/` | byte-genau prüfbar mit `SHA256SUMS` | byte-genau prüfbar mit `SHA256SUMS` |
 
-Die Prüfung `python -m src.verify` rechnet den vollständigen Lauf neu und bestätigt beides auf jedem
-Betriebssystem: veröffentlichte Daten gegen `SHA256SUMS`, frische Daten gegen die veröffentlichten
-(relative Toleranz 10⁻⁹) und die daraus erzeugten Tabellen und Zahlenmakros der Arbeit Zeichen für
-Zeichen.
+Die Prüfung `python -m src.verify` rechnet den vollständigen Lauf neu und bestätigt das auf jedem
+Betriebssystem in drei Schritten: veröffentlichte Daten gegen `SHA256SUMS`, frische Daten gegen die
+veröffentlichten (Toleranz 10⁻⁸, relativ ab Betrag 1, absolut darunter) und die daraus erzeugten
+Tabellen und Zahlenmakros der Arbeit Zeichen für Zeichen.
+
+Gemessen mit Version 1.1.2:
+
+| Rechner | byte-identische Dateien | größte Abweichung | Tabellen und Zahlen |
+|---|---|---|---|
+| Windows 11, Python 3.14.3 | 4 von 10 | 4 · 10⁻¹⁵ | 8 von 8 identisch |
+| GitHub Actions, Ubuntu, Python 3.14 | 3 von 10 | 9 · 10⁻¹¹ (Rundungsrest eines Werts, der mathematisch 0 ist) | 8 von 8 identisch |
+| GitHub Actions, Windows, Python 3.14 | 4 von 10 | 4 · 10⁻¹⁵ | 8 von 8 identisch |
 
 ```bash
 git clone https://github.com/jonasyr/microservices-amortization-model.git
@@ -105,15 +114,15 @@ pip install -r requirements.txt
 python -m src.verify      # vollständiger Lauf (ca. 6–8 min) und Vergleich, Ergebnis „OK: Replikation bestätigt.“
 pytest                    # Grenzfall- und Regressionstests
 
+sha256sum -c SHA256SUMS   # nur die veröffentlichten Daten prüfen (vor einem eigenen Lauf)
 python -m src.run_all     # nur rechnen → output/data/ (überschreibt die veröffentlichten Daten)
-sha256sum -c SHA256SUMS   # byte-genauer Vergleich, gilt auf der Referenzplattform
 python -m src.figures     # Abbildungen → output/figures/
 python -m src.tables      # LaTeX-Tabellen und Zahlenmakros der Arbeit → output/tabellen/
 ```
 
-Referenzumgebung: Linux x86_64, Python 3.14.7. Ohne eigene Installation: Unter
-*Actions → Reproduktion → Run workflow* rechnet GitHub den vollständigen Lauf unter Linux (mit
-Prüfsummenvergleich) und unter Windows (mit `src.verify`).
+Die veröffentlichten Daten stammen aus einem Lauf unter Linux x86_64 mit Python 3.14.7. Ohne eigene
+Installation: Unter *Actions → Reproduktion → Run workflow* rechnet GitHub den vollständigen Lauf
+unter Linux und Windows und prüft ihn mit `src.verify`.
 
 ## Struktur
 
@@ -147,11 +156,11 @@ Maschinenlesbare Angaben: [`CITATION.cff`](CITATION.cff). GitHub zeigt dazu rech
 Stochastic total-cost model comparing *microservices from the start* with *monolith first with a
 migration option* under uncertain user growth (Monte Carlo with 10,000 parameter sets, discounted,
 monthly steps, five-year horizon). It computes break-even growth rates, a growth × capacity-reserve
-map, local and global sensitivity (tornado, PRCC, SRRC²) and model variants. On the reference
-platform (Linux x86_64) a fresh run reproduces all result files byte for byte
-(`sha256sum -c SHA256SUMS`). On any operating system, `python -m src.verify` reruns the model and
-confirms that all tables and numbers quoted in the thesis are identical and that the raw results
-match the published ones (floating-point values may differ in the last digit). Companion code to a project
+map, local and global sensitivity (tornado, PRCC, SRRC²) and model variants. With a fixed seed and
+pinned packages, repeated runs on the same machine are byte-identical. On any operating system,
+`python -m src.verify` reruns the model and confirms that all tables and numbers quoted in the thesis
+are identical and that the raw results match the published ones (individual floating-point values
+may differ in the last digit across machines; verified on Windows and Ubuntu). Companion code to a project
 thesis in the B.Sc. Computer Science programme at IU International University of Applied Sciences
 (course “Praxisprojekt 6”, DSPRAXP6042501).
 
